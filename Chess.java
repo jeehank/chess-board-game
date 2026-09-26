@@ -282,7 +282,7 @@ class BoardPanel extends JPanel {
             illegalFlashTimer.stop();
         }
 
-        illegalFlashTimer = new Timer(400, evt -> {
+        illegalFlashTimer = new javax.swing.Timer(400, evt -> {
             illegalRow = -1;
             illegalCol = -1;
             repaint();
