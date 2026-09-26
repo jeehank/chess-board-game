@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Chess</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Premium Chess</h1>
+            <div class="status-bar" id="status">White to move</div>
+        </header>
+        
+        <div class="game-container">
+            <div class="player-info top-player">
+                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="details">
+                    <span class="name">Opponent</span>
+                    <span class="score">1200</span>
+                </div>
+                <div class="captured-pieces" id="top-captured"></div>
+            </div>
+
+            <div class="board-container">
+                <div id="board" class="board"></div>
+            </div>
+
+            <div class="player-info bottom-player">
+                <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="details">
+                    <span class="name">You</span>
+                    <span class="score">1200</span>
+                </div>
+                <div class="captured-pieces" id="bottom-captured"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="reset-btn" class="btn primary">New Game</button>
+            <button id="flip-btn" class="btn secondary">Flip Board</button>
+        </div>
+    </div>
+
+    <!-- Chess.js library for logic -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
