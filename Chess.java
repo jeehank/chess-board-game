@@ -2,66 +2,65 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.*;
+import java.net.*;
 import javax.imageio.ImageIO;
 import java.util.*;
 import java.util.List;
+import java.util.regex.*;
 import javax.sound.sampled.*;
 
 public class Chess extends JFrame {
-    private BoardPanel boardPanel;
-    private JLabel statusLabel;
-    private JLabel turnIndicator;
-    private JPanel topPlayerPanel;
-    private JPanel bottomPlayerPanel;
+    private CardLayout cardLayout;
+    private JPanel mainContainer;
+    private MenuView menuView;
+    private GameView gameView;
 
     public Chess() {
-        setTitle("Chess.com - Classic");
+        setTitle("Chess - Classic Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        getContentPane().setBackground(new Color(48, 46, 43)); // Chess.com deep brown/slate background
+        getContentPane().setBackground(new Color(48, 46, 43)); // Chess.com dark brown
 
-        // Top Header / Status bar
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(38, 36, 33));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
+        cardLayout = new CardLayout();
+        mainContainer = new JPanel(cardLayout);
+        mainContainer.setBackground(new Color(48, 46, 43));
 
-        statusLabel = new JLabel("White's Turn");
-        statusLabel.setForeground(new Color(240, 240, 240));
-        statusLabel.setFont(new Font("Poppins", Font.BOLD, 18));
-        headerPanel.add(statusLabel, BorderLayout.WEST);
+        menuView = new MenuView(this);
+        gameView = new GameView(this);
 
-        JButton newGameBtn = new JButton("New Game");
-        newGameBtn.setFocusPainted(false);
-        newGameBtn.setFont(new Font("Poppins", Font.BOLD, 13));
-        newGameBtn.setBackground(new Color(129, 182, 76)); // Chess.com green button
-        newGameBtn.setForeground(Color.WHITE);
-        newGameBtn.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
-        newGameBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        newGameBtn.addActionListener(e -> boardPanel.resetGame());
-        headerPanel.add(newGameBtn, BorderLayout.EAST);
+        mainContainer.add(menuView, "MENU");
+        mainContainer.add(gameView, "GAME");
 
-        add(headerPanel, BorderLayout.NORTH);
-
-        boardPanel = new BoardPanel(this);
-        add(boardPanel, BorderLayout.CENTER);
+        add(mainContainer);
+        showMenu();
 
         pack();
         setLocationRelativeTo(null);
         setResizable(false);
     }
 
-    public void updateStatus(String status, Color color) {
-        statusLabel.setText(status);
-        if (color != null) {
-            statusLabel.setForeground(color);
-        } else {
-            statusLabel.setForeground(new Color(240, 240, 240));
-        }
+    public void showMenu() {
+        gameView.stopTimer();
+        cardLayout.show(mainContainer, "MENU");
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    public void startNormalGame() {
+        gameView.startNewGame(false);
+        cardLayout.show(mainContainer, "GAME");
+        pack();
+        setLocationRelativeTo(null);
+    }
+
+    public void startTimedGame() {
+        gameView.startNewGame(true);
+        cardLayout.show(mainContainer, "GAME");
+        pack();
+        setLocationRelativeTo(null);
     }
 
     public static void main(String[] args) {
-        // Set Look and Feel to System
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {}
@@ -69,6 +68,519 @@ public class Chess extends JFrame {
         SwingUtilities.invokeLater(() -> {
             new Chess().setVisible(true);
         });
+    }
+}
+
+class MenuView extends JPanel {
+    public MenuView(Chess mainFrame) {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(new Color(48, 46, 43));
+        setPreferredSize(new Dimension(680, 780));
+        setBorder(BorderFactory.createEmptyBorder(60, 40, 60, 40));
+
+        // Title icon / crown
+        JLabel titleLabel = new JLabel("CHESS", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Poppins", Font.BOLD, 52));
+        titleLabel.setForeground(new Color(245, 245, 245));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitleLabel = new JLabel("Classic Board Game", SwingConstants.CENTER);
+        subtitleLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
+        subtitleLabel.setForeground(new Color(160, 155, 145));
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        add(Box.createVerticalGlue());
+        add(titleLabel);
+        add(Box.createRigidArea(new Dimension(0, 8)));
+        add(subtitleLabel);
+        add(Box.createRigidArea(new Dimension(0, 50)));
+
+        // Buttons
+        JButton normalBtn = createMenuButton("Play Normal Game", "Play without time pressure (Unlimited Time)", new Color(129, 182, 76));
+        normalBtn.addActionListener(e -> mainFrame.startNormalGame());
+
+        JButton timedBtn = createMenuButton("Play 10 Min Blitz", "Each player gets 10 minutes (Rapid Clock)", new Color(69, 123, 157));
+        timedBtn.addActionListener(e -> mainFrame.startTimedGame());
+
+        add(normalBtn);
+        add(Box.createRigidArea(new Dimension(0, 24)));
+        add(timedBtn);
+        add(Box.createVerticalGlue());
+
+        JLabel footer = new JLabel("Powered by Stockfish 16 Engine • Chess.com Style", SwingConstants.CENTER);
+        footer.setFont(new Font("Poppins", Font.PLAIN, 12));
+        footer.setForeground(new Color(120, 115, 105));
+        footer.setAlignmentX(Component.CENTER_ALIGNMENT);
+        add(footer);
+    }
+
+    private JButton createMenuButton(String mainText, String subText, Color bgColor) {
+        JButton btn = new JButton();
+        btn.setLayout(new BorderLayout());
+        btn.setBackground(bgColor);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setMaximumSize(new Dimension(450, 80));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel(mainText, SwingConstants.CENTER);
+        title.setFont(new Font("Poppins", Font.BOLD, 20));
+        title.setForeground(Color.WHITE);
+
+        JLabel sub = new JLabel(subText, SwingConstants.CENTER);
+        sub.setFont(new Font("Poppins", Font.PLAIN, 12));
+        sub.setForeground(new Color(230, 230, 230));
+
+        btn.add(title, BorderLayout.NORTH);
+        btn.add(sub, BorderLayout.SOUTH);
+        return btn;
+    }
+}
+
+class GameView extends JPanel {
+    private Chess mainFrame;
+    private BoardPanel boardPanel;
+    private EvaluationBar evaluationBar;
+
+    private JLabel statusLabel;
+    private JLabel whiteClockLabel;
+    private JLabel blackClockLabel;
+    private JPanel whitePlayerBox;
+    private JPanel blackPlayerBox;
+
+    private boolean isTimedMode = false;
+    private int whiteTimeSeconds = 600; // 10 minutes
+    private int blackTimeSeconds = 600; // 10 minutes
+    private javax.swing.Timer gameClockTimer;
+
+    public GameView(Chess mainFrame) {
+        this.mainFrame = mainFrame;
+        setLayout(new BorderLayout(0, 6));
+        setBackground(new Color(48, 46, 43));
+        setBorder(BorderFactory.createEmptyBorder(10, 14, 12, 14));
+
+        // 1. Top Bar: Menu Button, Status Label, Reset Button
+        JPanel topHeader = new JPanel(new BorderLayout());
+        topHeader.setBackground(new Color(38, 36, 33));
+        topHeader.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
+
+        JButton backBtn = new JButton("◀ Menu");
+        backBtn.setFont(new Font("Poppins", Font.BOLD, 13));
+        backBtn.setBackground(new Color(70, 68, 65));
+        backBtn.setForeground(Color.WHITE);
+        backBtn.setFocusPainted(false);
+        backBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+        backBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        backBtn.addActionListener(e -> mainFrame.showMenu());
+        topHeader.add(backBtn, BorderLayout.WEST);
+
+        statusLabel = new JLabel("White's Turn", SwingConstants.CENTER);
+        statusLabel.setForeground(new Color(245, 245, 245));
+        statusLabel.setFont(new Font("Poppins", Font.BOLD, 17));
+        topHeader.add(statusLabel, BorderLayout.CENTER);
+
+        JButton resetBtn = new JButton("Restart");
+        resetBtn.setFont(new Font("Poppins", Font.BOLD, 13));
+        resetBtn.setBackground(new Color(129, 182, 76));
+        resetBtn.setForeground(Color.WHITE);
+        resetBtn.setFocusPainted(false);
+        resetBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+        resetBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        resetBtn.addActionListener(e -> startNewGame(isTimedMode));
+        topHeader.add(resetBtn, BorderLayout.EAST);
+
+        add(topHeader, BorderLayout.NORTH);
+
+        // Center Panel: Black Info, Board, White Info, Evaluation Bar
+        JPanel centerContainer = new JPanel();
+        centerContainer.setLayout(new BoxLayout(centerContainer, BoxLayout.Y_AXIS));
+        centerContainer.setBackground(new Color(48, 46, 43));
+
+        // Black Player Bar
+        blackPlayerBox = createPlayerBar("Black (Opponent)", false);
+        blackClockLabel = new JLabel("10:00", SwingConstants.RIGHT);
+        styleClockLabel(blackClockLabel);
+        blackPlayerBox.add(blackClockLabel, BorderLayout.EAST);
+        centerContainer.add(blackPlayerBox);
+        centerContainer.add(Box.createRigidArea(new Dimension(0, 4)));
+
+        // Chess Board Panel
+        boardPanel = new BoardPanel(this);
+        centerContainer.add(boardPanel);
+        centerContainer.add(Box.createRigidArea(new Dimension(0, 4)));
+
+        // White Player Bar
+        whitePlayerBox = createPlayerBar("White (You)", true);
+        whiteClockLabel = new JLabel("10:00", SwingConstants.RIGHT);
+        styleClockLabel(whiteClockLabel);
+        whitePlayerBox.add(whiteClockLabel, BorderLayout.EAST);
+        centerContainer.add(whitePlayerBox);
+        centerContainer.add(Box.createRigidArea(new Dimension(0, 6)));
+
+        // Bottom Evaluation Bar
+        evaluationBar = new EvaluationBar();
+        centerContainer.add(evaluationBar);
+
+        add(centerContainer, BorderLayout.CENTER);
+
+        // 1-second clock timer
+        gameClockTimer = new javax.swing.Timer(1000, e -> tickClock());
+    }
+
+    private JPanel createPlayerBar(String name, boolean isWhite) {
+        JPanel bar = new JPanel(new BorderLayout());
+        bar.setBackground(new Color(38, 36, 33));
+        bar.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
+        bar.setMaximumSize(new Dimension(BoardPanel.TILE_SIZE * 8, 36));
+
+        JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        left.setOpaque(false);
+
+        JLabel avatar = new JLabel(isWhite ? "⚪" : "⚫");
+        avatar.setFont(new Font("Poppins", Font.PLAIN, 15));
+
+        JLabel nameLabel = new JLabel(name);
+        nameLabel.setFont(new Font("Poppins", Font.BOLD, 14));
+        nameLabel.setForeground(new Color(230, 230, 230));
+
+        left.add(avatar);
+        left.add(nameLabel);
+        bar.add(left, BorderLayout.WEST);
+        return bar;
+    }
+
+    private void styleClockLabel(JLabel lbl) {
+        lbl.setFont(new Font("Poppins", Font.BOLD, 16));
+        lbl.setForeground(new Color(245, 245, 245));
+        lbl.setBackground(new Color(25, 24, 22));
+        lbl.setOpaque(true);
+        lbl.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
+    }
+
+    public void startNewGame(boolean timed) {
+        this.isTimedMode = timed;
+        whiteTimeSeconds = 600;
+        blackTimeSeconds = 600;
+        updateClockDisplay();
+
+        whiteClockLabel.setVisible(timed);
+        blackClockLabel.setVisible(timed);
+
+        boardPanel.resetGame();
+        evaluationBar.resetEvaluation();
+
+        if (timed) {
+            gameClockTimer.restart();
+        } else {
+            gameClockTimer.stop();
+        }
+
+        updateTurnHighlights(PieceColor.WHITE);
+        updateStatus("White's Turn", null);
+    }
+
+    public void stopTimer() {
+        if (gameClockTimer != null) {
+            gameClockTimer.stop();
+        }
+    }
+
+    private void tickClock() {
+        if (!isTimedMode || boardPanel.isGameOver()) return;
+
+        if (boardPanel.getCurrentTurn() == PieceColor.WHITE) {
+            whiteTimeSeconds--;
+            if (whiteTimeSeconds <= 0) {
+                whiteTimeSeconds = 0;
+                gameClockTimer.stop();
+                updateClockDisplay();
+                boardPanel.setGameOver(true);
+                showGameOverDialog("Black", "on Time", "0 - 1");
+                return;
+            }
+        } else {
+            blackTimeSeconds--;
+            if (blackTimeSeconds <= 0) {
+                blackTimeSeconds = 0;
+                gameClockTimer.stop();
+                updateClockDisplay();
+                boardPanel.setGameOver(true);
+                showGameOverDialog("White", "on Time", "1 - 0");
+                return;
+            }
+        }
+        updateClockDisplay();
+    }
+
+    private void updateClockDisplay() {
+        whiteClockLabel.setText(String.format("%02d:%02d", whiteTimeSeconds / 60, whiteTimeSeconds % 60));
+        blackClockLabel.setText(String.format("%02d:%02d", blackTimeSeconds / 60, blackTimeSeconds % 60));
+    }
+
+    public void updateTurnHighlights(PieceColor turn) {
+        if (turn == PieceColor.WHITE) {
+            whiteClockLabel.setBackground(new Color(129, 182, 76));
+            whiteClockLabel.setForeground(Color.WHITE);
+            blackClockLabel.setBackground(new Color(25, 24, 22));
+            blackClockLabel.setForeground(new Color(200, 200, 200));
+        } else {
+            blackClockLabel.setBackground(new Color(129, 182, 76));
+            blackClockLabel.setForeground(Color.WHITE);
+            whiteClockLabel.setBackground(new Color(25, 24, 22));
+            whiteClockLabel.setForeground(new Color(200, 200, 200));
+        }
+    }
+
+    public void updateStatus(String status, Color color) {
+        statusLabel.setText(status);
+        if (color != null) {
+            statusLabel.setForeground(color);
+        } else {
+            statusLabel.setForeground(new Color(245, 245, 245));
+        }
+    }
+
+    public void requestEvaluation(String fen) {
+        evaluationBar.fetchEvaluation(fen);
+    }
+
+    public void showGameOverDialog(String winner, String reason, String score) {
+        stopTimer();
+        JDialog dialog = new JDialog(mainFrame, "Game Over", true);
+        dialog.setLayout(new BorderLayout());
+        dialog.getContentPane().setBackground(new Color(38, 36, 33));
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(new Color(38, 36, 33));
+        content.setBorder(BorderFactory.createEmptyBorder(28, 40, 28, 40));
+
+        JLabel titleLbl = new JLabel("GAME OVER", SwingConstants.CENTER);
+        titleLbl.setFont(new Font("Poppins", Font.BOLD, 28));
+        titleLbl.setForeground(new Color(245, 245, 245));
+        titleLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        String verdictText = winner.equals("Draw") ? "Game Drawn (" + reason + ")" : winner + " Won " + reason + "!";
+        JLabel verdictLbl = new JLabel(verdictText, SwingConstants.CENTER);
+        verdictLbl.setFont(new Font("Poppins", Font.BOLD, 18));
+        verdictLbl.setForeground(new Color(129, 182, 76));
+        verdictLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel scoreLbl = new JLabel(score, SwingConstants.CENTER);
+        scoreLbl.setFont(new Font("Poppins", Font.BOLD, 46));
+        scoreLbl.setForeground(Color.WHITE);
+        scoreLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        content.add(titleLbl);
+        content.add(Box.createRigidArea(new Dimension(0, 10)));
+        content.add(verdictLbl);
+        content.add(Box.createRigidArea(new Dimension(0, 16)));
+        content.add(scoreLbl);
+        content.add(Box.createRigidArea(new Dimension(0, 26)));
+
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 0));
+        btnPanel.setOpaque(false);
+
+        JButton playAgainBtn = new JButton("Play Again");
+        playAgainBtn.setFont(new Font("Poppins", Font.BOLD, 14));
+        playAgainBtn.setBackground(new Color(129, 182, 76));
+        playAgainBtn.setForeground(Color.WHITE);
+        playAgainBtn.setFocusPainted(false);
+        playAgainBtn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        playAgainBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        playAgainBtn.addActionListener(e -> {
+            dialog.dispose();
+            startNewGame(isTimedMode);
+        });
+
+        JButton menuBtn = new JButton("Main Menu");
+        menuBtn.setFont(new Font("Poppins", Font.BOLD, 14));
+        menuBtn.setBackground(new Color(70, 68, 65));
+        menuBtn.setForeground(Color.WHITE);
+        menuBtn.setFocusPainted(false);
+        menuBtn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        menuBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        menuBtn.addActionListener(e -> {
+            dialog.dispose();
+            mainFrame.showMenu();
+        });
+
+        btnPanel.add(playAgainBtn);
+        btnPanel.add(menuBtn);
+        content.add(btnPanel);
+
+        dialog.add(content, BorderLayout.CENTER);
+        dialog.pack();
+        dialog.setLocationRelativeTo(mainFrame);
+        dialog.setVisible(true);
+    }
+}
+
+class EvaluationBar extends JPanel {
+    private double eval = 0.0;
+    private double winChance = 50.0; // 0% to 100% for White
+    private Integer mateIn = null; // null or number of moves to mate
+    private String statusText = "0.0";
+    private int currentReqId = 0;
+
+    public EvaluationBar() {
+        setPreferredSize(new Dimension(BoardPanel.TILE_SIZE * 8, 30));
+        setMaximumSize(new Dimension(BoardPanel.TILE_SIZE * 8, 30));
+        setBackground(new Color(38, 36, 33));
+    }
+
+    public void resetEvaluation() {
+        eval = 0.0;
+        winChance = 50.0;
+        mateIn = null;
+        statusText = "0.0";
+        repaint();
+    }
+
+    public synchronized void fetchEvaluation(String fen) {
+        currentReqId++;
+        final int reqId = currentReqId;
+
+        // Run asynchronously so UI never blocks
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://chess-api.com/v1");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+                conn.setConnectTimeout(3000);
+                conn.setReadTimeout(3000);
+                conn.setDoOutput(true);
+
+                String payload = "{\"fen\":\"" + fen + "\"}";
+                try (OutputStream os = conn.getOutputStream()) {
+                    os.write(payload.getBytes("UTF-8"));
+                }
+
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                    StringBuilder resp = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        resp.append(line);
+                    }
+                    in.close();
+
+                    String json = resp.toString();
+                    parseAndApplyResponse(json, reqId);
+                }
+            } catch (Exception e) {
+                // If API is unreachable, evaluation stays at current or material fallback
+            }
+        }).start();
+    }
+
+    private void parseAndApplyResponse(String json, int reqId) {
+        if (reqId != currentReqId) return; // Discard outdated requests
+
+        try {
+            // Extract "eval": <num>
+            Double parsedEval = null;
+            Matcher evalMatcher = Pattern.compile("\"eval\":\\s*(-?\\d+(\\.\\d+)?)").matcher(json);
+            if (evalMatcher.find()) {
+                parsedEval = Double.parseDouble(evalMatcher.group(1));
+            }
+
+            // Extract "winChance": <num>
+            Double parsedWinChance = null;
+            Matcher winMatcher = Pattern.compile("\"winChance\":\\s*(-?\\d+(\\.\\d+)?)").matcher(json);
+            if (winMatcher.find()) {
+                parsedWinChance = Double.parseDouble(winMatcher.group(1));
+            }
+
+            // Extract "mate": <num> or null
+            Integer parsedMate = null;
+            Matcher mateMatcher = Pattern.compile("\"mate\":\\s*(-?\\d+)").matcher(json);
+            if (mateMatcher.find()) {
+                parsedMate = Integer.parseInt(mateMatcher.group(1));
+            }
+
+            final Double finalEval = parsedEval;
+            final Double finalWinChance = parsedWinChance;
+            final Integer finalMate = parsedMate;
+
+            SwingUtilities.invokeLater(() -> {
+                if (reqId == currentReqId) {
+                    if (finalMate != null) {
+                        this.mateIn = finalMate;
+                        this.winChance = (finalMate > 0) ? 100.0 : 0.0;
+                        this.statusText = (finalMate > 0 ? "M" + finalMate : "-M" + Math.abs(finalMate));
+                    } else if (finalEval != null) {
+                        this.mateIn = null;
+                        this.eval = finalEval;
+                        this.winChance = (finalWinChance != null) ? finalWinChance : (100.0 / (1.0 + Math.pow(10, -finalEval / 4.0)));
+                        this.statusText = (finalEval >= 0 ? "+" : "") + String.format(Locale.US, "%.1f", finalEval);
+                    }
+                    repaint();
+                }
+            });
+        } catch (Exception ignored) {}
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        int w = getWidth();
+        int h = getHeight();
+
+        // Background / Black portion
+        g2.setColor(new Color(33, 31, 28));
+        g2.fillRoundRect(0, 0, w, h, 8, 8);
+
+        // White portion (width proportional to winChance)
+        double clampedChance = Math.max(3.0, Math.min(97.0, winChance));
+        if (mateIn != null) {
+            clampedChance = (mateIn > 0) ? 100.0 : 0.0;
+        }
+
+        int whiteWidth = (int) Math.round(w * (clampedChance / 100.0));
+        g2.setColor(new Color(245, 245, 245));
+        g2.fillRoundRect(0, 0, whiteWidth, h, 8, 8);
+
+        // Divider
+        g2.setColor(new Color(100, 100, 100, 120));
+        g2.drawLine(whiteWidth, 0, whiteWidth, h);
+
+        // Evaluation text label
+        g2.setFont(new Font("Poppins", Font.BOLD, 13));
+        FontMetrics fm = g2.getFontMetrics();
+        int textW = fm.stringWidth(statusText);
+        int textH = fm.getAscent();
+
+        if (winChance >= 50.0) {
+            // Text on white side in dark color
+            g2.setColor(new Color(30, 30, 30));
+            int tx = 14;
+            g2.drawString(statusText, tx, (h + textH) / 2 - 2);
+        } else {
+            // Text on black side in light color
+            g2.setColor(new Color(240, 240, 240));
+            int tx = w - textW - 14;
+            g2.drawString(statusText, tx, (h + textH) / 2 - 2);
+        }
+
+        // Subtitle indicator on opposite side
+        g2.setFont(new Font("Poppins", Font.PLAIN, 10));
+        g2.setColor(new Color(140, 140, 140));
+        String engineText = "Stockfish 16";
+        int eW = g2.getFontMetrics().stringWidth(engineText);
+        if (winChance >= 50.0) {
+            g2.drawString(engineText, w - eW - 12, (h + 8) / 2);
+        } else {
+            g2.drawString(engineText, 12, (h + 8) / 2);
+        }
     }
 }
 
@@ -89,12 +601,6 @@ class ChessPiece {
         this.color = color;
         this.type = type;
     }
-
-    public ChessPiece copy() {
-        ChessPiece cp = new ChessPiece(this.color, this.type);
-        cp.hasMoved = this.hasMoved;
-        return cp;
-    }
 }
 
 class Move {
@@ -102,7 +608,6 @@ class Move {
     int toR, toC;
     boolean isEnPassant = false;
     boolean isCastling = false;
-    PieceType promotionType = null;
 
     public Move(int fromR, int fromC, int toR, int toC) {
         this.fromR = fromR;
@@ -125,17 +630,15 @@ class BoardPanel extends JPanel {
     public static final int TILE_SIZE = 82;
     public static final int BOARD_SIZE = 8;
 
-    // Exact board colors from chess.com screenshot
     public static final Color LIGHT_SQUARE = new Color(240, 217, 181);
     public static final Color DARK_SQUARE = new Color(181, 136, 99);
     
-    // Chess.com highlights
     public static final Color LAST_MOVE_COLOR = new Color(245, 246, 130, 160);
     public static final Color SELECTED_COLOR = new Color(245, 246, 130, 200);
     public static final Color ILLEGAL_FLASH_COLOR = new Color(235, 55, 55, 180);
     public static final Color CHECK_COLOR = new Color(235, 60, 60, 200);
 
-    private Chess gameWindow;
+    private GameView gameView;
     private ChessPiece[][] board = new ChessPiece[8][8];
     private Map<String, Image> pieceImages = new HashMap<>();
 
@@ -146,26 +649,20 @@ class BoardPanel extends JPanel {
     private int dragY = -1;
     private boolean isDragging = false;
 
-    // Last move highlight
     private int lastFromR = -1, lastFromC = -1;
     private int lastToR = -1, lastToC = -1;
-
-    // En Passant target square
     private int epRow = -1, epCol = -1;
 
-    // Illegal move animation
     private int illegalRow = -1, illegalCol = -1;
     private javax.swing.Timer illegalFlashTimer;
 
-    // Legal moves for selected piece
     private List<Move> legalMovesForSelected = new ArrayList<>();
-
-    // Game state
     private boolean gameOver = false;
 
-    public BoardPanel(Chess window) {
-        this.gameWindow = window;
+    public BoardPanel(GameView view) {
+        this.gameView = view;
         setPreferredSize(new Dimension(TILE_SIZE * BOARD_SIZE, TILE_SIZE * BOARD_SIZE));
+        setMaximumSize(new Dimension(TILE_SIZE * BOARD_SIZE, TILE_SIZE * BOARD_SIZE));
         setBackground(new Color(48, 46, 43));
         loadPieceImages();
         resetGame();
@@ -180,7 +677,6 @@ class BoardPanel extends JPanel {
 
                 if (r < 0 || r >= 8 || c < 0 || c >= 8) return;
 
-                // If already selected and clicking on a destination square
                 if (selectedRow != -1 && selectedCol != -1) {
                     Move matchingMove = getMoveTo(selectedRow, selectedCol, r, c);
                     if (matchingMove != null) {
@@ -194,7 +690,6 @@ class BoardPanel extends JPanel {
                     }
                 }
 
-                // Selecting a piece
                 ChessPiece p = board[r][c];
                 if (p != null && p.color == currentTurn) {
                     selectedRow = r;
@@ -204,7 +699,6 @@ class BoardPanel extends JPanel {
                     isDragging = true;
                     legalMovesForSelected = getLegalMovesForPiece(r, c);
                 } else if (p != null && p.color != currentTurn && selectedRow != -1) {
-                    // Clicked on opponent piece that is NOT a legal capture
                     triggerIllegalAnimation(r, c);
                     selectedRow = -1;
                     selectedCol = -1;
@@ -247,7 +741,6 @@ class BoardPanel extends JPanel {
                             repaint();
                             return;
                         } else {
-                            // Illegal move animation!
                             triggerIllegalAnimation(toR, toC);
                         }
                     }
@@ -262,6 +755,18 @@ class BoardPanel extends JPanel {
 
         addMouseListener(adapter);
         addMouseMotionListener(adapter);
+    }
+
+    public PieceColor getCurrentTurn() {
+        return currentTurn;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean val) {
+        this.gameOver = val;
     }
 
     private Move getMoveTo(int fromR, int fromC, int toR, int toC) {
@@ -339,7 +844,6 @@ class BoardPanel extends JPanel {
         illegalCol = -1;
         gameOver = false;
 
-        gameWindow.updateStatus("White's Turn", null);
         repaint();
     }
 
@@ -347,14 +851,12 @@ class BoardPanel extends JPanel {
         ChessPiece piece = board[m.fromR][m.fromC];
         ChessPiece captured = board[m.toR][m.toC];
 
-        // En Passant capture
         if (m.isEnPassant) {
             int capR = (piece.color == PieceColor.WHITE) ? m.toR + 1 : m.toR - 1;
             captured = board[capR][m.toC];
             board[capR][m.toC] = null;
         }
 
-        // Castling move for rook
         if (m.isCastling) {
             if (m.toC == 6) { // Kingside
                 ChessPiece rook = board[m.toR][7];
@@ -375,10 +877,10 @@ class BoardPanel extends JPanel {
 
         // Pawn promotion
         if (piece.type == PieceType.PAWN && (m.toR == 0 || m.toR == 7)) {
-            piece.type = askPromotionType(piece.color);
+            piece.type = askPromotionType();
         }
 
-        // En passant target update
+        // Update en passant
         if (piece.type == PieceType.PAWN && Math.abs(m.toR - m.fromR) == 2) {
             epRow = (m.fromR + m.toR) / 2;
             epCol = m.fromC;
@@ -400,6 +902,11 @@ class BoardPanel extends JPanel {
 
         // Switch turn
         currentTurn = (currentTurn == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
+        gameView.updateTurnHighlights(currentTurn);
+
+        // Stockfish evaluation request
+        String currentFEN = generateFEN();
+        gameView.requestEvaluation(currentFEN);
 
         // Check for checkmate or stalemate
         List<Move> nextLegalMoves = getAllLegalMoves(currentTurn, board, epRow, epCol);
@@ -409,22 +916,106 @@ class BoardPanel extends JPanel {
             gameOver = true;
             if (inCheck) {
                 String winner = (currentTurn == PieceColor.WHITE) ? "Black" : "White";
-                gameWindow.updateStatus("Checkmate! " + winner + " wins!", new Color(245, 100, 100));
-                JOptionPane.showMessageDialog(this, "Checkmate! " + winner + " wins the game!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                String score = (currentTurn == PieceColor.WHITE) ? "0 - 1" : "1 - 0";
+                gameView.updateStatus("Checkmate! " + winner + " wins (" + score + ")", new Color(245, 100, 100));
+                gameView.showGameOverDialog(winner, "by Checkmate", score);
             } else {
-                gameWindow.updateStatus("Stalemate - Draw!", new Color(220, 220, 100));
-                JOptionPane.showMessageDialog(this, "Stalemate! The game is a draw.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                gameView.updateStatus("Stalemate - Draw (½ - ½)", new Color(220, 220, 100));
+                gameView.showGameOverDialog("Draw", "Stalemate", "½ - ½");
             }
         } else {
             if (inCheck) {
-                gameWindow.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + " is in Check!", new Color(245, 100, 100));
+                gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + " is in Check!", new Color(245, 100, 100));
             } else {
-                gameWindow.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + "'s Turn", null);
+                gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + "'s Turn", null);
             }
         }
     }
 
-    private PieceType askPromotionType(PieceColor color) {
+    public String generateFEN() {
+        StringBuilder sb = new StringBuilder();
+        for (int r = 0; r < 8; r++) {
+            int emptyCount = 0;
+            for (int c = 0; c < 8; c++) {
+                ChessPiece p = board[r][c];
+                if (p == null) {
+                    emptyCount++;
+                } else {
+                    if (emptyCount > 0) {
+                        sb.append(emptyCount);
+                        emptyCount = 0;
+                    }
+                    char ch;
+                    switch (p.type) {
+                        case PAWN: ch = 'p'; break;
+                        case KNIGHT: ch = 'n'; break;
+                        case BISHOP: ch = 'b'; break;
+                        case ROOK: ch = 'r'; break;
+                        case QUEEN: ch = 'q'; break;
+                        case KING: ch = 'k'; break;
+                        default: ch = 'p';
+                    }
+                    if (p.color == PieceColor.WHITE) {
+                        ch = Character.toUpperCase(ch);
+                    }
+                    sb.append(ch);
+                }
+            }
+            if (emptyCount > 0) {
+                sb.append(emptyCount);
+            }
+            if (r < 7) {
+                sb.append('/');
+            }
+        }
+
+        sb.append(currentTurn == PieceColor.WHITE ? " w " : " b ");
+
+        // Castling
+        StringBuilder castling = new StringBuilder();
+        ChessPiece wKing = board[7][4];
+        if (wKing != null && wKing.type == PieceType.KING && !wKing.hasMoved) {
+            ChessPiece wKR = board[7][7];
+            if (wKR != null && wKR.type == PieceType.ROOK && !wKR.hasMoved) castling.append('K');
+            ChessPiece wQR = board[7][0];
+            if (wQR != null && wQR.type == PieceType.ROOK && !wQR.hasMoved) castling.append('Q');
+        }
+        ChessPiece bKing = board[0][4];
+        if (bKing != null && bKing.type == PieceType.KING && !bKing.hasMoved) {
+            ChessPiece bKR = board[0][7];
+            if (bKR != null && bKR.type == PieceType.ROOK && !bKR.hasMoved) castling.append('k');
+            ChessPiece bQR = board[0][0];
+            if (bQR != null && bQR.type == PieceType.ROOK && !bQR.hasMoved) castling.append('q');
+        }
+        if (castling.length() == 0) castling.append('-');
+        sb.append(castling.toString());
+
+        // En passant square only if legally capturable (prevents FEN validation error from API)
+        boolean canCaptureEp = false;
+        if (epRow != -1 && epCol != -1) {
+            int pawnR = (currentTurn == PieceColor.WHITE) ? epRow + 1 : epRow - 1;
+            if (pawnR >= 0 && pawnR < 8) {
+                if (epCol - 1 >= 0) {
+                    ChessPiece p = board[pawnR][epCol - 1];
+                    if (p != null && p.color == currentTurn && p.type == PieceType.PAWN) canCaptureEp = true;
+                }
+                if (epCol + 1 < 8) {
+                    ChessPiece p = board[pawnR][epCol + 1];
+                    if (p != null && p.color == currentTurn && p.type == PieceType.PAWN) canCaptureEp = true;
+                }
+            }
+        }
+        if (canCaptureEp) {
+            sb.append(" ").append((char)('a' + epCol)).append(8 - epRow);
+        } else {
+            sb.append(" -");
+        }
+
+        sb.append(" 0 1");
+        return sb.toString();
+    }
+
+    private PieceType askPromotionType() {
         String[] options = {"Queen", "Rook", "Bishop", "Knight"};
         int choice = JOptionPane.showOptionDialog(
             this,
@@ -482,7 +1073,6 @@ class BoardPanel extends JPanel {
         ChessPiece capturedEpPiece = null;
         int epCapR = -1, epCapC = -1;
 
-        // Apply
         b[m.toR][m.toC] = piece;
         b[m.fromR][m.fromC] = null;
 
@@ -495,7 +1085,6 @@ class BoardPanel extends JPanel {
 
         boolean kingInCheck = isKingInCheck(piece.color, b);
 
-        // Revert
         b[m.fromR][m.fromC] = piece;
         b[m.toR][m.toC] = destPiece;
         if (m.isEnPassant && capturedEpPiece != null) {
@@ -523,7 +1112,6 @@ class BoardPanel extends JPanel {
     }
 
     private boolean isSquareAttacked(int r, int c, PieceColor byColor, ChessPiece[][] b) {
-        // Pawns
         int pawnR = (byColor == PieceColor.WHITE) ? r + 1 : r - 1;
         if (pawnR >= 0 && pawnR < 8) {
             if (c - 1 >= 0) {
@@ -536,7 +1124,6 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // Knights
         int[][] knightDeltas = {{-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}};
         for (int[] d : knightDeltas) {
             int nr = r + d[0], nc = c + d[1];
@@ -546,7 +1133,6 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // King (adjacent)
         for (int dr = -1; dr <= 1; dr++) {
             for (int dc = -1; dc <= 1; dc++) {
                 if (dr == 0 && dc == 0) continue;
@@ -558,7 +1144,6 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // Straight lines (Rook / Queen)
         int[][] straight = {{-1,0},{1,0},{0,-1},{0,1}};
         for (int[] d : straight) {
             int nr = r + d[0], nc = c + d[1];
@@ -572,7 +1157,6 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // Diagonal lines (Bishop / Queen)
         int[][] diag = {{-1,-1},{-1,1},{1,-1},{1,1}};
         for (int[] d : diag) {
             int nr = r + d[0], nc = c + d[1];
@@ -599,17 +1183,14 @@ class BoardPanel extends JPanel {
 
         switch (p.type) {
             case PAWN:
-                // 1 square forward
                 int oneR = r + forward;
                 if (oneR >= 0 && oneR < 8 && b[oneR][c] == null) {
                     moves.add(new Move(r, c, oneR, c));
-                    // 2 squares forward
                     int twoR = r + 2 * forward;
                     if (r == startRank && b[twoR][c] == null) {
                         moves.add(new Move(r, c, twoR, c));
                     }
                 }
-                // Captures
                 int[] capCols = {c - 1, c + 1};
                 for (int capC : capCols) {
                     if (capC >= 0 && capC < 8) {
@@ -619,7 +1200,6 @@ class BoardPanel extends JPanel {
                             if (target != null && target.color != p.color) {
                                 moves.add(new Move(r, c, destR, capC));
                             }
-                            // En Passant
                             if (destR == curEpR && capC == curEpC) {
                                 moves.add(new Move(r, c, destR, capC, true, false));
                             }
@@ -668,7 +1248,6 @@ class BoardPanel extends JPanel {
                 // Castling
                 if (!p.hasMoved && !isKingInCheck(p.color, b)) {
                     PieceColor opp = (p.color == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
-                    // Kingside
                     ChessPiece kRook = b[r][7];
                     if (kRook != null && kRook.type == PieceType.ROOK && !kRook.hasMoved) {
                         if (b[r][5] == null && b[r][6] == null) {
@@ -677,7 +1256,6 @@ class BoardPanel extends JPanel {
                             }
                         }
                     }
-                    // Queenside
                     ChessPiece qRook = b[r][0];
                     if (qRook != null && qRook.type == PieceType.ROOK && !qRook.hasMoved) {
                         if (b[r][1] == null && b[r][2] == null && b[r][3] == null) {
@@ -787,9 +1365,7 @@ class BoardPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         Font coordFont = new Font("Poppins", Font.BOLD, 12);
-        Font fallbackFont = new Font("SansSerif", Font.BOLD, 12);
 
-        // Find king in check for red alert glow
         int checkKingR = -1, checkKingC = -1;
         if (isKingInCheck(currentTurn, board)) {
             for (int r = 0; r < 8; r++) {
@@ -804,7 +1380,7 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // Draw Squares & Coordinates
+        // Draw Squares
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 boolean isLight = (r + c) % 2 == 0;
@@ -830,28 +1406,26 @@ class BoardPanel extends JPanel {
                     g2.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 }
 
-                // Illegal Move Flash Animation
+                // Illegal Move Flash
                 if (r == illegalRow && c == illegalCol) {
                     g2.setColor(ILLEGAL_FLASH_COLOR);
                     g2.fillRect(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE, TILE_SIZE);
                 }
 
-                // Draw Coordinates like Chess.com:
-                // Rank numbers (8..1) on leftmost column (c == 0)
+                // Coordinates
                 if (c == 0) {
                     g2.setColor(isLight ? DARK_SQUARE : LIGHT_SQUARE);
                     g2.setFont(coordFont);
                     g2.drawString(String.valueOf(8 - r), 5, r * TILE_SIZE + 16);
                 }
 
-                // File letters (a..h) on bottom row (r == 7)
                 if (r == 7) {
                     g2.setColor(isLight ? DARK_SQUARE : LIGHT_SQUARE);
                     g2.setFont(coordFont);
                     g2.drawString(String.valueOf((char)('a' + c)), c * TILE_SIZE + TILE_SIZE - 12, r * TILE_SIZE + TILE_SIZE - 5);
                 }
 
-                // Draw Piece (if not being dragged)
+                // Piece
                 ChessPiece p = board[r][c];
                 if (p != null && (!isDragging || r != selectedRow || c != selectedCol)) {
                     drawPiece(g2, p, c * TILE_SIZE, r * TILE_SIZE);
@@ -859,7 +1433,7 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // Draw Legal Move Hints (Dots & Capture Rings)
+        // Draw Legal Move Hints (Dots & Rings)
         if (selectedRow != -1 && selectedCol != -1) {
             for (Move m : legalMovesForSelected) {
                 int cx = m.toC * TILE_SIZE + TILE_SIZE / 2;
@@ -867,12 +1441,10 @@ class BoardPanel extends JPanel {
                 ChessPiece target = board[m.toR][m.toC];
 
                 if (target == null && !m.isEnPassant) {
-                    // Empty square: solid subtle dot
                     g2.setColor(new Color(0, 0, 0, 45));
                     int dotRadius = TILE_SIZE / 6;
                     g2.fillOval(cx - dotRadius, cy - dotRadius, dotRadius * 2, dotRadius * 2);
                 } else {
-                    // Capture square: capture ring
                     g2.setColor(new Color(0, 0, 0, 50));
                     int ringRadius = (int)(TILE_SIZE * 0.42);
                     Stroke oldStroke = g2.getStroke();
@@ -883,7 +1455,7 @@ class BoardPanel extends JPanel {
             }
         }
 
-        // Draw Dragged Piece centered on mouse cursor
+        // Dragged Piece
         if (isDragging && selectedRow != -1 && selectedCol != -1) {
             ChessPiece p = board[selectedRow][selectedCol];
             if (p != null) {
@@ -894,7 +1466,6 @@ class BoardPanel extends JPanel {
 
     private void drawPiece(Graphics2D g2, ChessPiece p, int x, int y) {
         String key = (p.color == PieceColor.WHITE ? "w" : "b") + p.type.name().toLowerCase().substring(0, 1);
-        // Note: knight is 'n'
         if (p.type == PieceType.KNIGHT) {
             key = (p.color == PieceColor.WHITE ? "w" : "b") + "n";
         }
@@ -903,7 +1474,6 @@ class BoardPanel extends JPanel {
         if (img != null) {
             g2.drawImage(img, x, y, null);
         } else {
-            // Text Fallback if image not found
             g2.setColor(p.color == PieceColor.WHITE ? Color.WHITE : Color.BLACK);
             g2.setFont(new Font("Poppins", Font.BOLD, 42));
             String symbol = p.type.name().substring(0, 1);
