@@ -155,7 +155,7 @@ class BoardPanel extends JPanel {
 
     // Illegal move animation
     private int illegalRow = -1, illegalCol = -1;
-    private Timer illegalFlashTimer;
+    private javax.swing.Timer illegalFlashTimer;
 
     // Legal moves for selected piece
     private List<Move> legalMovesForSelected = new ArrayList<>();
