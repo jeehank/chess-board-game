@@ -118,7 +118,7 @@ class MenuView extends JPanel {
         JButton btn = new JButton();
         btn.setLayout(new BorderLayout());
         btn.setBackground(bgColor);
-        btn.setForeground(Color.WHITE);
+        btn.setForeground(Color.BLACK);
         btn.setFocusPainted(false);
         btn.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -127,11 +127,11 @@ class MenuView extends JPanel {
 
         JLabel title = new JLabel(mainText, SwingConstants.CENTER);
         title.setFont(new Font("Poppins", Font.BOLD, 20));
-        title.setForeground(Color.WHITE);
+        title.setForeground(Color.BLACK);
 
         JLabel sub = new JLabel(subText, SwingConstants.CENTER);
         sub.setFont(new Font("Poppins", Font.PLAIN, 12));
-        sub.setForeground(new Color(230, 230, 230));
+        sub.setForeground(new Color(50, 50, 50));
 
         btn.add(title, BorderLayout.NORTH);
         btn.add(sub, BorderLayout.SOUTH);
