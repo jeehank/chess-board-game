@@ -449,7 +449,7 @@ class MenuView extends JPanel {
         JButton cancelBtn = new JButton("Cancel");
         cancelBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         cancelBtn.setBackground(new Color(60, 58, 54));
-        cancelBtn.setForeground(Color.WHITE);
+        cancelBtn.setForeground(Color.BLACK);
         cancelBtn.setFocusPainted(false);
         cancelBtn.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         cancelBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -458,7 +458,7 @@ class MenuView extends JPanel {
         JButton startBtn = new JButton("Start Duel ⚔");
         startBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         startBtn.setBackground(new Color(129, 182, 76));
-        startBtn.setForeground(Color.WHITE);
+        startBtn.setForeground(Color.BLACK);
         startBtn.setFocusPainted(false);
         startBtn.setBorder(BorderFactory.createEmptyBorder(8, 22, 8, 22));
         startBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
