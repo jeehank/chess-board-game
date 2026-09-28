@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+import os
+
+html_content = '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1592,7 +1594,7 @@
                     }
                     deferredPrompt = null;
                 } else {
-                    alert('To install on Android:\n\n1. Tap the ⋮ (three dots) menu in your browser.\n2. Tap "Install App" or "Add to Home screen".\n3. Chess Master will install to your phone!');
+                    alert('To install on Android:\\n\\n1. Tap the ⋮ (three dots) menu in your browser.\\n2. Tap "Install App" or "Add to Home screen".\\n3. Chess Master will install to your phone!');
                 }
             });
 
@@ -1628,3 +1630,9 @@
     </script>
 </body>
 </html>
+'''
+
+with open('Install-Chess-Android.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print('Install-Chess-Android.html created successfully!')
