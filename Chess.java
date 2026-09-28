@@ -145,31 +145,31 @@ class MenuView extends JPanel {
         container.add(subtitleLabel);
         container.add(Box.createRigidArea(new Dimension(0, 22)));
 
-        // Time Control Toggle
-        JLabel timeHeader = new JLabel("TIME CONTROL", SwingConstants.CENTER);
+        // Play Classic Section
+        JLabel timeHeader = new JLabel("PLAY CLASSIC CHESS", SwingConstants.CENTER);
         timeHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
         timeHeader.setForeground(new Color(170, 165, 155));
         timeHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(timeHeader);
         container.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        JPanel timeBtnRow = new JPanel(new GridLayout(1, 2, 12, 0));
+        JPanel timeBtnRow = new JPanel(new GridLayout(1, 2, 14, 0));
         timeBtnRow.setOpaque(false);
-        timeBtnRow.setMaximumSize(new Dimension(520, 46));
-        timeBtnRow.setPreferredSize(new Dimension(520, 46));
+        timeBtnRow.setMaximumSize(new Dimension(520, 50));
+        timeBtnRow.setPreferredSize(new Dimension(520, 50));
         timeBtnRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        casualBtn = createTimeButton("🕊️  Casual (Unlimited)", !isTimedSelected);
-        blitzBtn = createTimeButton("⚡  10 Min Blitz", isTimedSelected);
+        casualBtn = createPlayButton("Play Casual (Unlimited)", new Color(129, 182, 76), new Color(145, 202, 88));
+        blitzBtn = createPlayButton("Play 10 Min Blitz", new Color(69, 123, 157), new Color(85, 140, 175));
 
         casualBtn.addActionListener(e -> {
             isTimedSelected = false;
-            updateTimeButtonStyles();
+            mainFrame.startNormalGame();
         });
 
         blitzBtn.addActionListener(e -> {
             isTimedSelected = true;
-            updateTimeButtonStyles();
+            mainFrame.startTimedGame();
         });
 
         timeBtnRow.add(casualBtn);
@@ -178,7 +178,7 @@ class MenuView extends JPanel {
         container.add(Box.createRigidArea(new Dimension(0, 24)));
 
         // Game Modes Grid
-        JLabel modeHeader = new JLabel("SELECT GAME MODE", SwingConstants.CENTER);
+        JLabel modeHeader = new JLabel("SELECT ARMY VARIANT", SwingConstants.CENTER);
         modeHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
         modeHeader.setForeground(new Color(170, 165, 155));
         modeHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -222,43 +222,39 @@ class MenuView extends JPanel {
         add(container, BorderLayout.CENTER);
     }
 
-    private JButton createTimeButton(String text, boolean active) {
-        JButton btn = new JButton(text);
+    private JButton createPlayButton(String text, final Color bg, final Color hoverBg) {
+        final JButton btn = new JButton(text);
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        applyTimeButtonStyle(btn, active);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(255, 255, 255, 50), 1),
+            BorderFactory.createEmptyBorder(10, 14, 10, 14)
+        ));
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(hoverBg);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(bg);
+            }
+        });
         return btn;
-    }
-
-    private void applyTimeButtonStyle(JButton btn, boolean active) {
-        if (active) {
-            btn.setBackground(new Color(129, 182, 76)); // Chess.com green
-            btn.setForeground(Color.BLACK);
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(160, 210, 100), 2),
-                BorderFactory.createEmptyBorder(8, 14, 8, 14)
-            ));
-        } else {
-            btn.setBackground(new Color(38, 36, 33));
-            btn.setForeground(Color.BLACK);
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
-                BorderFactory.createEmptyBorder(8, 14, 8, 14)
-            ));
-        }
-    }
-
-    private void updateTimeButtonStyles() {
-        applyTimeButtonStyle(casualBtn, !isTimedSelected);
-        applyTimeButtonStyle(blitzBtn, isTimedSelected);
     }
 
     private JButton createModeCard(final GameMode mode) {
         final JButton btn = new JButton();
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         btn.setLayout(new BorderLayout(10, 0));
         btn.setBackground(new Color(38, 36, 33));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
@@ -267,8 +263,8 @@ class MenuView extends JPanel {
 
         // Left Icon
         JLabel iconLbl = new JLabel(mode.icon, SwingConstants.CENTER);
-        iconLbl.setFont(new Font("Segoe UI", Font.PLAIN, 28));
-        iconLbl.setForeground(Color.BLACK);
+        iconLbl.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 28));
+        iconLbl.setForeground(mode.accentColor);
         iconLbl.setPreferredSize(new Dimension(36, 36));
 
         // Text Content
@@ -278,11 +274,11 @@ class MenuView extends JPanel {
 
         JLabel titleLbl = new JLabel(mode.title);
         titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        titleLbl.setForeground(Color.BLACK);
+        titleLbl.setForeground(new Color(245, 245, 245));
 
         JLabel descLbl = new JLabel(mode.description);
         descLbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        descLbl.setForeground(new Color(80, 80, 80));
+        descLbl.setForeground(new Color(160, 155, 145));
 
         textPanel.add(titleLbl);
         textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -316,9 +312,11 @@ class MenuView extends JPanel {
 
     private JButton createCustomDuelCard() {
         final JButton btn = new JButton();
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         btn.setLayout(new BorderLayout(12, 0));
         btn.setBackground(new Color(38, 36, 33));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setMaximumSize(new Dimension(620, 56));
         btn.setPreferredSize(new Dimension(620, 56));
@@ -329,8 +327,8 @@ class MenuView extends JPanel {
         ));
 
         JLabel iconLbl = new JLabel("⚔", SwingConstants.CENTER);
-        iconLbl.setFont(new Font("Segoe UI", Font.PLAIN, 28));
-        iconLbl.setForeground(Color.BLACK);
+        iconLbl.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 28));
+        iconLbl.setForeground(new Color(230, 57, 70));
         iconLbl.setPreferredSize(new Dimension(36, 36));
 
         JPanel textPanel = new JPanel();
@@ -339,11 +337,11 @@ class MenuView extends JPanel {
 
         JLabel titleLbl = new JLabel("Custom Army Duel (Mix & Match)");
         titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        titleLbl.setForeground(Color.BLACK);
+        titleLbl.setForeground(new Color(245, 245, 245));
 
         JLabel descLbl = new JLabel("Select custom piece types for White and Black armies (e.g. Bishops vs Knights)");
         descLbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        descLbl.setForeground(new Color(80, 80, 80));
+        descLbl.setForeground(new Color(160, 155, 145));
 
         textPanel.add(titleLbl);
         textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -351,7 +349,7 @@ class MenuView extends JPanel {
 
         JLabel arrowLbl = new JLabel("Setup ▶");
         arrowLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        arrowLbl.setForeground(Color.BLACK);
+        arrowLbl.setForeground(new Color(230, 57, 70));
 
         btn.add(iconLbl, BorderLayout.WEST);
         btn.add(textPanel, BorderLayout.CENTER);
