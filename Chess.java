@@ -17,7 +17,7 @@ public class Chess extends JFrame {
     private GameView gameView;
 
     public Chess() {
-        setTitle("Chess - Army Variants & Classic Game");
+        setTitle("Chess - Classic Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(new Color(48, 46, 43)); // Chess.com dark brown
 
@@ -128,12 +128,12 @@ class MenuView extends JPanel {
         crownLabel.setForeground(new Color(233, 196, 106));
         crownLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel titleLabel = new JLabel("CHESS BATTLES", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("CHESS", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 40));
         titleLabel.setForeground(new Color(245, 245, 245));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitleLabel = new JLabel("Army Variants & Classic Board Game", SwingConstants.CENTER);
+        JLabel subtitleLabel = new JLabel("Classic Board Game", SwingConstants.CENTER);
         subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         subtitleLabel.setForeground(new Color(160, 155, 145));
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -234,14 +234,14 @@ class MenuView extends JPanel {
     private void applyTimeButtonStyle(JButton btn, boolean active) {
         if (active) {
             btn.setBackground(new Color(129, 182, 76)); // Chess.com green
-            btn.setForeground(Color.WHITE);
+            btn.setForeground(Color.BLACK);
             btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(160, 210, 100), 2),
                 BorderFactory.createEmptyBorder(8, 14, 8, 14)
             ));
         } else {
             btn.setBackground(new Color(38, 36, 33));
-            btn.setForeground(new Color(180, 175, 165));
+            btn.setForeground(Color.BLACK);
             btn.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
                 BorderFactory.createEmptyBorder(8, 14, 8, 14)
@@ -268,7 +268,7 @@ class MenuView extends JPanel {
         // Left Icon
         JLabel iconLbl = new JLabel(mode.icon, SwingConstants.CENTER);
         iconLbl.setFont(new Font("Segoe UI", Font.PLAIN, 28));
-        iconLbl.setForeground(mode.accentColor);
+        iconLbl.setForeground(Color.BLACK);
         iconLbl.setPreferredSize(new Dimension(36, 36));
 
         // Text Content
@@ -278,11 +278,11 @@ class MenuView extends JPanel {
 
         JLabel titleLbl = new JLabel(mode.title);
         titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        titleLbl.setForeground(new Color(245, 245, 245));
+        titleLbl.setForeground(Color.BLACK);
 
         JLabel descLbl = new JLabel(mode.description);
         descLbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        descLbl.setForeground(new Color(160, 155, 145));
+        descLbl.setForeground(new Color(80, 80, 80));
 
         textPanel.add(titleLbl);
         textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -330,7 +330,7 @@ class MenuView extends JPanel {
 
         JLabel iconLbl = new JLabel("⚔", SwingConstants.CENTER);
         iconLbl.setFont(new Font("Segoe UI", Font.PLAIN, 28));
-        iconLbl.setForeground(new Color(230, 57, 70));
+        iconLbl.setForeground(Color.BLACK);
         iconLbl.setPreferredSize(new Dimension(36, 36));
 
         JPanel textPanel = new JPanel();
@@ -339,11 +339,11 @@ class MenuView extends JPanel {
 
         JLabel titleLbl = new JLabel("Custom Army Duel (Mix & Match)");
         titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        titleLbl.setForeground(new Color(245, 245, 245));
+        titleLbl.setForeground(Color.BLACK);
 
         JLabel descLbl = new JLabel("Select custom piece types for White and Black armies (e.g. Bishops vs Knights)");
         descLbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        descLbl.setForeground(new Color(160, 155, 145));
+        descLbl.setForeground(new Color(80, 80, 80));
 
         textPanel.add(titleLbl);
         textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
@@ -351,7 +351,7 @@ class MenuView extends JPanel {
 
         JLabel arrowLbl = new JLabel("Setup ▶");
         arrowLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        arrowLbl.setForeground(new Color(230, 57, 70));
+        arrowLbl.setForeground(Color.BLACK);
 
         btn.add(iconLbl, BorderLayout.WEST);
         btn.add(textPanel, BorderLayout.CENTER);
