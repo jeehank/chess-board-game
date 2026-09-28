@@ -347,8 +347,8 @@ class MenuView extends JPanel {
         textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
         textPanel.add(descLbl);
 
-        JLabel arrowLbl = new JLabel("Setup ▶");
-        arrowLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        JLabel arrowLbl = new JLabel("Setup >");
+        arrowLbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
         arrowLbl.setForeground(new Color(230, 57, 70));
 
         btn.add(iconLbl, BorderLayout.WEST);
