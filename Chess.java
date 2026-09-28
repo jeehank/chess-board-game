@@ -71,7 +71,8 @@ public class Chess extends JFrame {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         SwingUtilities.invokeLater(() -> {
             new Chess().setVisible(true);
@@ -81,11 +82,16 @@ public class Chess extends JFrame {
 
 enum GameMode {
     CLASSIC("Classic Chess", "Standard traditional FIDE setup & rules", "👑", new Color(233, 196, 106), null, null),
-    ALL_PAWNS("Pawns Only", "1 King + 15 Pawns on both sides. A massive pawn war!", "♟", new Color(129, 182, 76), PieceType.PAWN, PieceType.PAWN),
-    ALL_BISHOPS("Bishops Only", "1 King + 15 Bishops on both sides. Diagonal snipers!", "♝", new Color(42, 157, 143), PieceType.BISHOP, PieceType.BISHOP),
-    ALL_KNIGHTS("Knights Only", "1 King + 15 Knights on both sides. Wild jumping combat!", "♞", new Color(231, 111, 81), PieceType.KNIGHT, PieceType.KNIGHT),
-    ALL_ROOKS("Rooks Only", "1 King + 15 Rooks on both sides. Heavy artillery fortress!", "♜", new Color(69, 123, 157), PieceType.ROOK, PieceType.ROOK),
-    ALL_QUEENS("Queens Only", "1 King + 15 Queens on both sides. Ultimate royal mayhem!", "♛", new Color(155, 93, 229), PieceType.QUEEN, PieceType.QUEEN),
+    ALL_PAWNS("Pawns Only", "1 King + 15 Pawns on both sides. A massive pawn war!", "♟", new Color(129, 182, 76),
+            PieceType.PAWN, PieceType.PAWN),
+    ALL_BISHOPS("Bishops Only", "1 King + 15 Bishops on both sides. Diagonal snipers!", "♝", new Color(42, 157, 143),
+            PieceType.BISHOP, PieceType.BISHOP),
+    ALL_KNIGHTS("Knights Only", "1 King + 15 Knights on both sides. Wild jumping combat!", "♞", new Color(231, 111, 81),
+            PieceType.KNIGHT, PieceType.KNIGHT),
+    ALL_ROOKS("Rooks Only", "1 King + 15 Rooks on both sides. Heavy artillery fortress!", "♜", new Color(69, 123, 157),
+            PieceType.ROOK, PieceType.ROOK),
+    ALL_QUEENS("Queens Only", "1 King + 15 Queens on both sides. Ultimate royal mayhem!", "♛", new Color(155, 93, 229),
+            PieceType.QUEEN, PieceType.QUEEN),
     CUSTOM("Custom Duel", "Choose custom army piece types for White & Black!", "⚔", new Color(230, 57, 70), null, null);
 
     final String title;
@@ -95,7 +101,8 @@ enum GameMode {
     final PieceType defaultWhite;
     final PieceType defaultBlack;
 
-    GameMode(String title, String description, String icon, Color accentColor, PieceType defaultWhite, PieceType defaultBlack) {
+    GameMode(String title, String description, String icon, Color accentColor, PieceType defaultWhite,
+            PieceType defaultBlack) {
         this.title = title;
         this.description = description;
         this.icon = icon;
@@ -192,9 +199,9 @@ class MenuView extends JPanel {
         gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         GameMode[] standardModes = {
-            GameMode.ALL_PAWNS, GameMode.ALL_BISHOPS,
-            GameMode.ALL_KNIGHTS, GameMode.ALL_ROOKS,
-            GameMode.ALL_QUEENS, GameMode.CLASSIC
+                GameMode.ALL_PAWNS, GameMode.ALL_BISHOPS,
+                GameMode.ALL_KNIGHTS, GameMode.ALL_ROOKS,
+                GameMode.ALL_QUEENS, GameMode.CLASSIC
         };
 
         for (final GameMode gm : standardModes) {
@@ -232,14 +239,14 @@ class MenuView extends JPanel {
         btn.setOpaque(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(255, 255, 255, 50), 1),
-            BorderFactory.createEmptyBorder(10, 14, 10, 14)
-        ));
+                BorderFactory.createLineBorder(new Color(255, 255, 255, 50), 1),
+                BorderFactory.createEmptyBorder(10, 14, 10, 14)));
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(hoverBg);
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(bg);
@@ -257,9 +264,8 @@ class MenuView extends JPanel {
         btn.setOpaque(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
-            BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
+                BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
+                BorderFactory.createEmptyBorder(8, 12, 8, 12)));
 
         // Left Icon
         JLabel iconLbl = new JLabel(mode.icon, SwingConstants.CENTER);
@@ -293,17 +299,16 @@ class MenuView extends JPanel {
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(new Color(52, 50, 46));
                 btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(mode.accentColor, 1),
-                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
-                ));
+                        BorderFactory.createLineBorder(mode.accentColor, 1),
+                        BorderFactory.createEmptyBorder(8, 12, 8, 12)));
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(new Color(38, 36, 33));
                 btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
-                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
-                ));
+                        BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
+                        BorderFactory.createEmptyBorder(8, 12, 8, 12)));
             }
         });
 
@@ -322,9 +327,8 @@ class MenuView extends JPanel {
         btn.setPreferredSize(new Dimension(620, 56));
         btn.setAlignmentX(Component.CENTER_ALIGNMENT);
         btn.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(230, 57, 70), 1),
-            BorderFactory.createEmptyBorder(8, 16, 8, 16)
-        ));
+                BorderFactory.createLineBorder(new Color(230, 57, 70), 1),
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)));
 
         JLabel iconLbl = new JLabel("⚔", SwingConstants.CENTER);
         iconLbl.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 28));
@@ -360,6 +364,7 @@ class MenuView extends JPanel {
             public void mouseEntered(MouseEvent e) {
                 btn.setBackground(new Color(55, 45, 45));
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 btn.setBackground(new Color(38, 36, 33));
@@ -395,20 +400,20 @@ class MenuView extends JPanel {
         content.add(Box.createRigidArea(new Dimension(0, 20)));
 
         String[] options = {
-            "♟ Pawns (1 King + 15 Pawns)",
-            "♝ Bishops (1 King + 15 Bishops)",
-            "♞ Knights (1 King + 15 Knights)",
-            "♜ Rooks (1 King + 15 Rooks)",
-            "♛ Queens (1 King + 15 Queens)",
-            "👑 Classic Traditional Army"
+                "♟ Pawns (1 King + 15 Pawns)",
+                "♝ Bishops (1 King + 15 Bishops)",
+                "♞ Knights (1 King + 15 Knights)",
+                "♜ Rooks (1 King + 15 Rooks)",
+                "♛ Queens (1 King + 15 Queens)",
+                "👑 Classic Traditional Army"
         };
         final PieceType[] pieceMap = {
-            PieceType.PAWN,
-            PieceType.BISHOP,
-            PieceType.KNIGHT,
-            PieceType.ROOK,
-            PieceType.QUEEN,
-            null
+                PieceType.PAWN,
+                PieceType.BISHOP,
+                PieceType.KNIGHT,
+                PieceType.ROOK,
+                PieceType.QUEEN,
+                null
         };
 
         // White selection
@@ -644,8 +649,10 @@ class GameView extends JPanel {
         this.isTimedMode = timed;
         this.currentWhiteArmy = whitePiece;
         this.currentBlackArmy = blackPiece;
-        String wStr = (whitePiece == null) ? "Classic" : whitePiece.name().substring(0, 1) + whitePiece.name().substring(1).toLowerCase() + "s";
-        String bStr = (blackPiece == null) ? "Classic" : blackPiece.name().substring(0, 1) + blackPiece.name().substring(1).toLowerCase() + "s";
+        String wStr = (whitePiece == null) ? "Classic"
+                : whitePiece.name().substring(0, 1) + whitePiece.name().substring(1).toLowerCase() + "s";
+        String bStr = (blackPiece == null) ? "Classic"
+                : blackPiece.name().substring(0, 1) + blackPiece.name().substring(1).toLowerCase() + "s";
         this.currentModeName = wStr + " vs " + bStr;
         applyGameStart();
     }
@@ -669,8 +676,10 @@ class GameView extends JPanel {
 
         modeLabel.setText(currentGameMode.icon + " " + currentModeName + (isTimedMode ? " • 10m Blitz" : " • Casual"));
 
-        String wArmyStr = (currentWhiteArmy == null) ? "Classic" : (currentWhiteArmy.name().substring(0, 1) + currentWhiteArmy.name().substring(1).toLowerCase() + "s");
-        String bArmyStr = (currentBlackArmy == null) ? "Classic" : (currentBlackArmy.name().substring(0, 1) + currentBlackArmy.name().substring(1).toLowerCase() + "s");
+        String wArmyStr = (currentWhiteArmy == null) ? "Classic"
+                : (currentWhiteArmy.name().substring(0, 1) + currentWhiteArmy.name().substring(1).toLowerCase() + "s");
+        String bArmyStr = (currentBlackArmy == null) ? "Classic"
+                : (currentBlackArmy.name().substring(0, 1) + currentBlackArmy.name().substring(1).toLowerCase() + "s");
         whiteNameLabel.setText("White (You) • " + wArmyStr);
         blackNameLabel.setText("Black (Opponent) • " + bArmyStr);
 
@@ -700,7 +709,8 @@ class GameView extends JPanel {
     }
 
     private void tickClock() {
-        if (!isTimedMode || boardPanel.isGameOver()) return;
+        if (!isTimedMode || boardPanel.isGameOver())
+            return;
 
         if (boardPanel.getCurrentTurn() == PieceColor.WHITE) {
             whiteTimeSeconds--;
@@ -870,15 +880,29 @@ class EvaluationBar extends JPanel {
                 if (p != null) {
                     int val = 0;
                     switch (p.type) {
-                        case PAWN: val = 1; break;
-                        case KNIGHT: val = 3; break;
-                        case BISHOP: val = 3; break;
-                        case ROOK: val = 5; break;
-                        case QUEEN: val = 9; break;
-                        case KING: val = 0; break;
+                        case PAWN:
+                            val = 1;
+                            break;
+                        case KNIGHT:
+                            val = 3;
+                            break;
+                        case BISHOP:
+                            val = 3;
+                            break;
+                        case ROOK:
+                            val = 5;
+                            break;
+                        case QUEEN:
+                            val = 9;
+                            break;
+                        case KING:
+                            val = 0;
+                            break;
                     }
-                    if (p.color == PieceColor.WHITE) whiteVal += val;
-                    else blackVal += val;
+                    if (p.color == PieceColor.WHITE)
+                        whiteVal += val;
+                    else
+                        blackVal += val;
                 }
             }
         }
@@ -934,7 +958,8 @@ class EvaluationBar extends JPanel {
     }
 
     private void parseAndApplyResponse(String json, int reqId) {
-        if (reqId != currentReqId) return; // Discard outdated requests
+        if (reqId != currentReqId)
+            return; // Discard outdated requests
 
         try {
             Double parsedEval = null;
@@ -969,13 +994,15 @@ class EvaluationBar extends JPanel {
                     } else if (finalEval != null) {
                         this.mateIn = null;
                         this.eval = finalEval;
-                        this.winChance = (finalWinChance != null) ? finalWinChance : (100.0 / (1.0 + Math.pow(10, -finalEval / 4.0)));
+                        this.winChance = (finalWinChance != null) ? finalWinChance
+                                : (100.0 / (1.0 + Math.pow(10, -finalEval / 4.0)));
                         this.statusText = (finalEval >= 0 ? "+" : "") + String.format(Locale.US, "%.1f", finalEval);
                     }
                     repaint();
                 }
             });
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
@@ -1082,7 +1109,7 @@ class BoardPanel extends JPanel {
 
     public static final Color LIGHT_SQUARE = new Color(240, 217, 181);
     public static final Color DARK_SQUARE = new Color(181, 136, 99);
-    
+
     public static final Color LAST_MOVE_COLOR = new Color(245, 246, 130, 160);
     public static final Color SELECTED_COLOR = new Color(245, 246, 130, 200);
     public static final Color ILLEGAL_FLASH_COLOR = new Color(235, 55, 55, 180);
@@ -1113,7 +1140,8 @@ class BoardPanel extends JPanel {
     private List<Move> legalMovesForSelected = new ArrayList<>();
     private boolean gameOver = false;
 
-    // Draw detection: position history for threefold repetition + halfmove clock for 50-move rule
+    // Draw detection: position history for threefold repetition + halfmove clock
+    // for 50-move rule
     private Map<String, Integer> positionHistory = new HashMap<>();
     private int halfmoveClock = 0;
 
@@ -1128,12 +1156,14 @@ class BoardPanel extends JPanel {
         MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (gameOver) return;
+                if (gameOver)
+                    return;
 
                 int c = e.getX() / TILE_SIZE;
                 int r = e.getY() / TILE_SIZE;
 
-                if (r < 0 || r >= 8 || c < 0 || c >= 8) return;
+                if (r < 0 || r >= 8 || c < 0 || c >= 8)
+                    return;
 
                 if (selectedRow != -1 && selectedCol != -1) {
                     Move matchingMove = getMoveTo(selectedRow, selectedCol, r, c);
@@ -1182,7 +1212,8 @@ class BoardPanel extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (!isDragging || selectedRow == -1) return;
+                if (!isDragging || selectedRow == -1)
+                    return;
 
                 int toC = e.getX() / TILE_SIZE;
                 int toR = e.getY() / TILE_SIZE;
@@ -1362,12 +1393,14 @@ class BoardPanel extends JPanel {
                 ChessPiece rook = board[m.toR][7];
                 board[m.toR][5] = rook;
                 board[m.toR][7] = null;
-                if (rook != null) rook.hasMoved = true;
+                if (rook != null)
+                    rook.hasMoved = true;
             } else if (m.toC == 2) { // Queenside
                 ChessPiece rook = board[m.toR][0];
                 board[m.toR][3] = rook;
                 board[m.toR][0] = null;
-                if (rook != null) rook.hasMoved = true;
+                if (rook != null)
+                    rook.hasMoved = true;
             }
         }
 
@@ -1456,7 +1489,8 @@ class BoardPanel extends JPanel {
             gameView.showGameOverDialog("Draw", "50-Move Rule", "½ - ½");
         } else {
             if (inCheck) {
-                gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + " is in Check!", new Color(245, 100, 100));
+                gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + " is in Check!",
+                        new Color(245, 100, 100));
             } else {
                 gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + "'s Turn", null);
             }
@@ -1477,13 +1511,26 @@ class BoardPanel extends JPanel {
                 } else {
                     char ch;
                     switch (p.type) {
-                        case PAWN: ch = 'p'; break;
-                        case KNIGHT: ch = 'n'; break;
-                        case BISHOP: ch = 'b'; break;
-                        case ROOK: ch = 'r'; break;
-                        case QUEEN: ch = 'q'; break;
-                        case KING: ch = 'k'; break;
-                        default: ch = '?';
+                        case PAWN:
+                            ch = 'p';
+                            break;
+                        case KNIGHT:
+                            ch = 'n';
+                            break;
+                        case BISHOP:
+                            ch = 'b';
+                            break;
+                        case ROOK:
+                            ch = 'r';
+                            break;
+                        case QUEEN:
+                            ch = 'q';
+                            break;
+                        case KING:
+                            ch = 'k';
+                            break;
+                        default:
+                            ch = '?';
                     }
                     sb.append(p.color == PieceColor.WHITE ? Character.toUpperCase(ch) : ch);
                 }
@@ -1507,14 +1554,18 @@ class BoardPanel extends JPanel {
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 ChessPiece p = board[r][c];
-                if (p == null) continue;
-                if (p.type == PieceType.KING) continue; // Don't count kings
+                if (p == null)
+                    continue;
+                if (p.type == PieceType.KING)
+                    continue; // Don't count kings
                 if (p.color == PieceColor.WHITE) {
                     whitePieces.add(p);
-                    if (p.type == PieceType.BISHOP) whiteBishopColorSum += (r + c) % 2;
+                    if (p.type == PieceType.BISHOP)
+                        whiteBishopColorSum += (r + c) % 2;
                 } else {
                     blackPieces.add(p);
-                    if (p.type == PieceType.BISHOP) blackBishopColorSum += (r + c) % 2;
+                    if (p.type == PieceType.BISHOP)
+                        blackBishopColorSum += (r + c) % 2;
                 }
             }
         }
@@ -1523,22 +1574,26 @@ class BoardPanel extends JPanel {
         int bCount = blackPieces.size();
 
         // K vs K
-        if (wCount == 0 && bCount == 0) return true;
+        if (wCount == 0 && bCount == 0)
+            return true;
 
         // K+minor vs K
         if (wCount == 0 && bCount == 1) {
             PieceType t = blackPieces.get(0).type;
-            if (t == PieceType.BISHOP || t == PieceType.KNIGHT) return true;
+            if (t == PieceType.BISHOP || t == PieceType.KNIGHT)
+                return true;
         }
         if (bCount == 0 && wCount == 1) {
             PieceType t = whitePieces.get(0).type;
-            if (t == PieceType.BISHOP || t == PieceType.KNIGHT) return true;
+            if (t == PieceType.BISHOP || t == PieceType.KNIGHT)
+                return true;
         }
 
         // K+B vs K+B (same color bishops only)
         if (wCount == 1 && bCount == 1) {
             if (whitePieces.get(0).type == PieceType.BISHOP && blackPieces.get(0).type == PieceType.BISHOP) {
-                if (whiteBishopColorSum == blackBishopColorSum) return true;
+                if (whiteBishopColorSum == blackBishopColorSum)
+                    return true;
             }
         }
 
@@ -1560,13 +1615,26 @@ class BoardPanel extends JPanel {
                     }
                     char ch;
                     switch (p.type) {
-                        case PAWN: ch = 'p'; break;
-                        case KNIGHT: ch = 'n'; break;
-                        case BISHOP: ch = 'b'; break;
-                        case ROOK: ch = 'r'; break;
-                        case QUEEN: ch = 'q'; break;
-                        case KING: ch = 'k'; break;
-                        default: ch = 'p';
+                        case PAWN:
+                            ch = 'p';
+                            break;
+                        case KNIGHT:
+                            ch = 'n';
+                            break;
+                        case BISHOP:
+                            ch = 'b';
+                            break;
+                        case ROOK:
+                            ch = 'r';
+                            break;
+                        case QUEEN:
+                            ch = 'q';
+                            break;
+                        case KING:
+                            ch = 'k';
+                            break;
+                        default:
+                            ch = 'p';
                     }
                     if (p.color == PieceColor.WHITE) {
                         ch = Character.toUpperCase(ch);
@@ -1589,18 +1657,23 @@ class BoardPanel extends JPanel {
         ChessPiece wKing = board[7][4];
         if (wKing != null && wKing.type == PieceType.KING && !wKing.hasMoved) {
             ChessPiece wKR = board[7][7];
-            if (wKR != null && wKR.type == PieceType.ROOK && !wKR.hasMoved) castling.append('K');
+            if (wKR != null && wKR.type == PieceType.ROOK && !wKR.hasMoved)
+                castling.append('K');
             ChessPiece wQR = board[7][0];
-            if (wQR != null && wQR.type == PieceType.ROOK && !wQR.hasMoved) castling.append('Q');
+            if (wQR != null && wQR.type == PieceType.ROOK && !wQR.hasMoved)
+                castling.append('Q');
         }
         ChessPiece bKing = board[0][4];
         if (bKing != null && bKing.type == PieceType.KING && !bKing.hasMoved) {
             ChessPiece bKR = board[0][7];
-            if (bKR != null && bKR.type == PieceType.ROOK && !bKR.hasMoved) castling.append('k');
+            if (bKR != null && bKR.type == PieceType.ROOK && !bKR.hasMoved)
+                castling.append('k');
             ChessPiece bQR = board[0][0];
-            if (bQR != null && bQR.type == PieceType.ROOK && !bQR.hasMoved) castling.append('q');
+            if (bQR != null && bQR.type == PieceType.ROOK && !bQR.hasMoved)
+                castling.append('q');
         }
-        if (castling.length() == 0) castling.append('-');
+        if (castling.length() == 0)
+            castling.append('-');
         sb.append(castling.toString());
 
         // En passant square only if legally capturable
@@ -1610,16 +1683,18 @@ class BoardPanel extends JPanel {
             if (pawnR >= 0 && pawnR < 8) {
                 if (epCol - 1 >= 0) {
                     ChessPiece p = board[pawnR][epCol - 1];
-                    if (p != null && p.color == currentTurn && p.type == PieceType.PAWN) canCaptureEp = true;
+                    if (p != null && p.color == currentTurn && p.type == PieceType.PAWN)
+                        canCaptureEp = true;
                 }
                 if (epCol + 1 < 8) {
                     ChessPiece p = board[pawnR][epCol + 1];
-                    if (p != null && p.color == currentTurn && p.type == PieceType.PAWN) canCaptureEp = true;
+                    if (p != null && p.color == currentTurn && p.type == PieceType.PAWN)
+                        canCaptureEp = true;
                 }
             }
         }
         if (canCaptureEp) {
-            sb.append(" ").append((char)('a' + epCol)).append(8 - epRow);
+            sb.append(" ").append((char) ('a' + epCol)).append(8 - epRow);
         } else {
             sb.append(" -");
         }
@@ -1629,29 +1704,33 @@ class BoardPanel extends JPanel {
     }
 
     private PieceType askPromotionType() {
-        String[] options = {"Queen", "Rook", "Bishop", "Knight"};
+        String[] options = { "Queen", "Rook", "Bishop", "Knight" };
         int choice = JOptionPane.showOptionDialog(
-            this,
-            "Select piece for promotion:",
-            "Pawn Promotion",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.PLAIN_MESSAGE,
-            null,
-            options,
-            options[0]
-        );
+                this,
+                "Select piece for promotion:",
+                "Pawn Promotion",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]);
         switch (choice) {
-            case 1: return PieceType.ROOK;
-            case 2: return PieceType.BISHOP;
-            case 3: return PieceType.KNIGHT;
-            default: return PieceType.QUEEN;
+            case 1:
+                return PieceType.ROOK;
+            case 2:
+                return PieceType.BISHOP;
+            case 3:
+                return PieceType.KNIGHT;
+            default:
+                return PieceType.QUEEN;
         }
     }
 
     public List<Move> getLegalMovesForPiece(int r, int c) {
         List<Move> legal = new ArrayList<>();
         ChessPiece p = board[r][c];
-        if (p == null || p.color != currentTurn) return legal;
+        if (p == null || p.color != currentTurn)
+            return legal;
 
         List<Move> pseudo = getPseudoLegalMoves(r, c, board, epRow, epCol);
         for (Move m : pseudo) {
@@ -1719,7 +1798,8 @@ class BoardPanel extends JPanel {
                 }
             }
         }
-        if (kr == -1) return true;
+        if (kr == -1)
+            return true;
         PieceColor opp = (color == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
         return isSquareAttacked(kr, kc, opp, b);
     }
@@ -1729,57 +1809,67 @@ class BoardPanel extends JPanel {
         if (pawnR >= 0 && pawnR < 8) {
             if (c - 1 >= 0) {
                 ChessPiece p = b[pawnR][c - 1];
-                if (p != null && p.color == byColor && p.type == PieceType.PAWN) return true;
+                if (p != null && p.color == byColor && p.type == PieceType.PAWN)
+                    return true;
             }
             if (c + 1 < 8) {
                 ChessPiece p = b[pawnR][c + 1];
-                if (p != null && p.color == byColor && p.type == PieceType.PAWN) return true;
+                if (p != null && p.color == byColor && p.type == PieceType.PAWN)
+                    return true;
             }
         }
 
-        int[][] knightDeltas = {{-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}};
+        int[][] knightDeltas = { { -2, -1 }, { -2, 1 }, { -1, -2 }, { -1, 2 }, { 1, -2 }, { 1, 2 }, { 2, -1 },
+                { 2, 1 } };
         for (int[] d : knightDeltas) {
             int nr = r + d[0], nc = c + d[1];
             if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                 ChessPiece p = b[nr][nc];
-                if (p != null && p.color == byColor && p.type == PieceType.KNIGHT) return true;
+                if (p != null && p.color == byColor && p.type == PieceType.KNIGHT)
+                    return true;
             }
         }
 
         for (int dr = -1; dr <= 1; dr++) {
             for (int dc = -1; dc <= 1; dc++) {
-                if (dr == 0 && dc == 0) continue;
+                if (dr == 0 && dc == 0)
+                    continue;
                 int nr = r + dr, nc = c + dc;
                 if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                     ChessPiece p = b[nr][nc];
-                    if (p != null && p.color == byColor && p.type == PieceType.KING) return true;
+                    if (p != null && p.color == byColor && p.type == PieceType.KING)
+                        return true;
                 }
             }
         }
 
-        int[][] straight = {{-1,0},{1,0},{0,-1},{0,1}};
+        int[][] straight = { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } };
         for (int[] d : straight) {
             int nr = r + d[0], nc = c + d[1];
             while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                 ChessPiece p = b[nr][nc];
                 if (p != null) {
-                    if (p.color == byColor && (p.type == PieceType.ROOK || p.type == PieceType.QUEEN)) return true;
+                    if (p.color == byColor && (p.type == PieceType.ROOK || p.type == PieceType.QUEEN))
+                        return true;
                     break;
                 }
-                nr += d[0]; nc += d[1];
+                nr += d[0];
+                nc += d[1];
             }
         }
 
-        int[][] diag = {{-1,-1},{-1,1},{1,-1},{1,1}};
+        int[][] diag = { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } };
         for (int[] d : diag) {
             int nr = r + d[0], nc = c + d[1];
             while (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                 ChessPiece p = b[nr][nc];
                 if (p != null) {
-                    if (p.color == byColor && (p.type == PieceType.BISHOP || p.type == PieceType.QUEEN)) return true;
+                    if (p.color == byColor && (p.type == PieceType.BISHOP || p.type == PieceType.QUEEN))
+                        return true;
                     break;
                 }
-                nr += d[0]; nc += d[1];
+                nr += d[0];
+                nc += d[1];
             }
         }
 
@@ -1789,7 +1879,8 @@ class BoardPanel extends JPanel {
     private List<Move> getPseudoLegalMoves(int r, int c, ChessPiece[][] b, int curEpR, int curEpC) {
         List<Move> moves = new ArrayList<>();
         ChessPiece p = b[r][c];
-        if (p == null) return moves;
+        if (p == null)
+            return moves;
 
         int forward = (p.color == PieceColor.WHITE) ? -1 : 1;
 
@@ -1799,13 +1890,14 @@ class BoardPanel extends JPanel {
                 if (oneR >= 0 && oneR < 8 && b[oneR][c] == null) {
                     moves.add(new Move(r, c, oneR, c));
                     int twoR = r + 2 * forward;
-                    // Pawns on their starting rank (including back rank in Pawns Only mode) can advance 2 squares
+                    // Pawns on their starting rank (including back rank in Pawns Only mode) can
+                    // advance 2 squares
                     boolean isPawnStart = (p.color == PieceColor.WHITE) ? (r == 6 || r == 7) : (r == 1 || r == 0);
                     if (isPawnStart && twoR >= 0 && twoR < 8 && b[twoR][c] == null) {
                         moves.add(new Move(r, c, twoR, c));
                     }
                 }
-                int[] capCols = {c - 1, c + 1};
+                int[] capCols = { c - 1, c + 1 };
                 for (int capC : capCols) {
                     if (capC >= 0 && capC < 8) {
                         int destR = r + forward;
@@ -1823,7 +1915,8 @@ class BoardPanel extends JPanel {
                 break;
 
             case KNIGHT:
-                int[][] kDeltas = {{-2,-1},{-2,1},{-1,-2},{-1,2},{1,-2},{1,2},{2,-1},{2,1}};
+                int[][] kDeltas = { { -2, -1 }, { -2, 1 }, { -1, -2 }, { -1, 2 }, { 1, -2 }, { 1, 2 }, { 2, -1 },
+                        { 2, 1 } };
                 for (int[] d : kDeltas) {
                     int nr = r + d[0], nc = c + d[1];
                     if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
@@ -1835,21 +1928,23 @@ class BoardPanel extends JPanel {
                 break;
 
             case BISHOP:
-                addRayMoves(r, c, b, p.color, new int[][]{{-1,-1},{-1,1},{1,-1},{1,1}}, moves);
+                addRayMoves(r, c, b, p.color, new int[][] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 } }, moves);
                 break;
 
             case ROOK:
-                addRayMoves(r, c, b, p.color, new int[][]{{-1,0},{1,0},{0,-1},{0,1}}, moves);
+                addRayMoves(r, c, b, p.color, new int[][] { { -1, 0 }, { 1, 0 }, { 0, -1 }, { 0, 1 } }, moves);
                 break;
 
             case QUEEN:
-                addRayMoves(r, c, b, p.color, new int[][]{{-1,-1},{-1,1},{1,-1},{1,1},{-1,0},{1,0},{0,-1},{0,1}}, moves);
+                addRayMoves(r, c, b, p.color, new int[][] { { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 1 }, { -1, 0 },
+                        { 1, 0 }, { 0, -1 }, { 0, 1 } }, moves);
                 break;
 
             case KING:
                 for (int dr = -1; dr <= 1; dr++) {
                     for (int dc = -1; dc <= 1; dc++) {
-                        if (dr == 0 && dc == 0) continue;
+                        if (dr == 0 && dc == 0)
+                            continue;
                         int nr = r + dr, nc = c + dc;
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
                             if (b[nr][nc] == null || b[nr][nc].color != p.color) {
@@ -1904,22 +1999,32 @@ class BoardPanel extends JPanel {
     }
 
     private void loadPieceImages() {
-        String[] types = {"p", "n", "b", "r", "q", "k"};
-        String[] colors = {"w", "b"};
+        String[] types = { "p", "n", "b", "r", "q", "k" };
+        String[] colors = { "w", "b" };
 
         for (String c : colors) {
             for (String t : types) {
                 String key = c + t;
-                File f = new File("pieces/" + key + ".png");
-                if (f.exists()) {
-                    try {
-                        BufferedImage img = ImageIO.read(f);
-                        if (img != null) {
-                            pieceImages.put(key, img.getScaledInstance(TILE_SIZE, TILE_SIZE, Image.SCALE_SMOOTH));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                BufferedImage img = null;
+                try (InputStream is = Chess.class.getResourceAsStream("/pieces/" + key + ".png")) {
+                    if (is != null) {
+                        img = ImageIO.read(is);
                     }
+                } catch (Exception ignored) {}
+
+                if (img == null) {
+                    File f = new File("pieces/" + key + ".png");
+                    if (f.exists()) {
+                        try {
+                            img = ImageIO.read(f);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                if (img != null) {
+                    pieceImages.put(key, img.getScaledInstance(TILE_SIZE, TILE_SIZE, Image.SCALE_SMOOTH));
                 }
             }
         }
@@ -1932,30 +2037,30 @@ class BoardPanel extends JPanel {
                 byte[] buf;
                 if ("move".equals(type)) {
                     int ms = 40;
-                    int len = (int)(sampleRate * ms / 1000);
+                    int len = (int) (sampleRate * ms / 1000);
                     buf = new byte[len];
                     for (int i = 0; i < len; i++) {
                         double decay = Math.exp(-i / (sampleRate * 0.007));
                         double sin = Math.sin(2 * Math.PI * 440 * (i / sampleRate));
-                        buf[i] = (byte)(sin * decay * 100);
+                        buf[i] = (byte) (sin * decay * 100);
                     }
                 } else if ("capture".equals(type)) {
                     int ms = 75;
-                    int len = (int)(sampleRate * ms / 1000);
+                    int len = (int) (sampleRate * ms / 1000);
                     buf = new byte[len];
                     for (int i = 0; i < len; i++) {
                         double decay = Math.exp(-i / (sampleRate * 0.015));
                         double sin = Math.sin(2 * Math.PI * 250 * (i / sampleRate));
-                        buf[i] = (byte)(sin * decay * 120);
+                        buf[i] = (byte) (sin * decay * 120);
                     }
                 } else if ("illegal".equals(type)) {
                     int ms = 110;
-                    int len = (int)(sampleRate * ms / 1000);
+                    int len = (int) (sampleRate * ms / 1000);
                     buf = new byte[len];
                     for (int i = 0; i < len; i++) {
                         double decay = Math.exp(-i / (sampleRate * 0.03));
                         double sin = Math.sin(2 * Math.PI * 140 * (i / sampleRate));
-                        buf[i] = (byte)(sin * decay * 110);
+                        buf[i] = (byte) (sin * decay * 110);
                     }
                 } else {
                     return;
@@ -1967,7 +2072,8 @@ class BoardPanel extends JPanel {
                 sdl.write(buf, 0, buf.length);
                 sdl.drain();
                 sdl.close();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }).start();
     }
 
@@ -2036,7 +2142,8 @@ class BoardPanel extends JPanel {
                 if (r == 7) {
                     g2.setColor(isLight ? DARK_SQUARE : LIGHT_SQUARE);
                     g2.setFont(coordFont);
-                    g2.drawString(String.valueOf((char)('a' + c)), c * TILE_SIZE + TILE_SIZE - 12, r * TILE_SIZE + TILE_SIZE - 5);
+                    g2.drawString(String.valueOf((char) ('a' + c)), c * TILE_SIZE + TILE_SIZE - 12,
+                            r * TILE_SIZE + TILE_SIZE - 5);
                 }
 
                 // Piece
@@ -2060,7 +2167,7 @@ class BoardPanel extends JPanel {
                     g2.fillOval(cx - dotRadius, cy - dotRadius, dotRadius * 2, dotRadius * 2);
                 } else {
                     g2.setColor(new Color(0, 0, 0, 50));
-                    int ringRadius = (int)(TILE_SIZE * 0.42);
+                    int ringRadius = (int) (TILE_SIZE * 0.42);
                     Stroke oldStroke = g2.getStroke();
                     g2.setStroke(new BasicStroke(6));
                     g2.drawOval(cx - ringRadius, cy - ringRadius, ringRadius * 2, ringRadius * 2);
@@ -2091,7 +2198,8 @@ class BoardPanel extends JPanel {
             g2.setColor(p.color == PieceColor.WHITE ? Color.WHITE : Color.BLACK);
             g2.setFont(new Font("Segoe UI", Font.BOLD, 42));
             String symbol = p.type.name().substring(0, 1);
-            if (p.type == PieceType.KNIGHT) symbol = "N";
+            if (p.type == PieceType.KNIGHT)
+                symbol = "N";
             g2.drawString(symbol, x + 24, y + 54);
         }
     }
