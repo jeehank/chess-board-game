@@ -123,8 +123,8 @@ class MenuView extends JPanel {
         container.setOpaque(false);
 
         // Header
-        JLabel crownLabel = new JLabel("👑", SwingConstants.CENTER);
-        crownLabel.setFont(new Font("Segoe UI", Font.PLAIN, 38));
+        JLabel crownLabel = new JLabel("♔", SwingConstants.CENTER);
+        crownLabel.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 44));
         crownLabel.setForeground(new Color(233, 196, 106));
         crownLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -518,10 +518,12 @@ class GameView extends JPanel {
         topHeader.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
 
         JButton backBtn = new JButton("◀ Menu");
+        backBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         backBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         backBtn.setBackground(new Color(230, 230, 230));
         backBtn.setForeground(Color.BLACK);
         backBtn.setFocusPainted(false);
+        backBtn.setOpaque(true);
         backBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
         backBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backBtn.addActionListener(e -> mainFrame.showMenu());
@@ -537,7 +539,7 @@ class GameView extends JPanel {
         statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 17));
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        modeLabel = new JLabel("👑 Classic Chess • Casual", SwingConstants.CENTER);
+        modeLabel = new JLabel("Classic Chess • Casual", SwingConstants.CENTER);
         modeLabel.setForeground(new Color(170, 165, 155));
         modeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         modeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -548,10 +550,12 @@ class GameView extends JPanel {
         topHeader.add(centerStatusPanel, BorderLayout.CENTER);
 
         JButton resetBtn = new JButton("Restart");
+        resetBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         resetBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         resetBtn.setBackground(new Color(230, 230, 230));
         resetBtn.setForeground(Color.BLACK);
         resetBtn.setFocusPainted(false);
+        resetBtn.setOpaque(true);
         resetBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
         resetBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         resetBtn.addActionListener(e -> restartCurrentGame());
@@ -796,10 +800,12 @@ class GameView extends JPanel {
         btnPanel.setOpaque(false);
 
         JButton playAgainBtn = new JButton("Play Again");
+        playAgainBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         playAgainBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        playAgainBtn.setBackground(new Color(230, 230, 230));
-        playAgainBtn.setForeground(Color.BLACK);
+        playAgainBtn.setBackground(new Color(129, 182, 76));
+        playAgainBtn.setForeground(Color.WHITE);
         playAgainBtn.setFocusPainted(false);
+        playAgainBtn.setOpaque(true);
         playAgainBtn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         playAgainBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         playAgainBtn.addActionListener(e -> {
@@ -808,10 +814,12 @@ class GameView extends JPanel {
         });
 
         JButton menuBtn = new JButton("Main Menu");
+        menuBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         menuBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        menuBtn.setBackground(new Color(230, 230, 230));
-        menuBtn.setForeground(Color.BLACK);
+        menuBtn.setBackground(new Color(60, 58, 54));
+        menuBtn.setForeground(Color.WHITE);
         menuBtn.setFocusPainted(false);
+        menuBtn.setOpaque(true);
         menuBtn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         menuBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         menuBtn.addActionListener(e -> {
