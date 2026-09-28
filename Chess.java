@@ -1103,6 +1103,10 @@ class BoardPanel extends JPanel {
     private List<Move> legalMovesForSelected = new ArrayList<>();
     private boolean gameOver = false;
 
+    // Draw detection: position history for threefold repetition + halfmove clock for 50-move rule
+    private Map<String, Integer> positionHistory = new HashMap<>();
+    private int halfmoveClock = 0;
+
     public BoardPanel(GameView view) {
         this.gameView = view;
         setPreferredSize(new Dimension(TILE_SIZE * BOARD_SIZE, TILE_SIZE * BOARD_SIZE));
@@ -1323,6 +1327,12 @@ class BoardPanel extends JPanel {
         illegalRow = -1;
         illegalCol = -1;
         gameOver = false;
+        positionHistory.clear();
+        halfmoveClock = 0;
+
+        // Record starting position
+        String startKey = generatePositionKey();
+        positionHistory.put(startKey, 1);
 
         repaint();
     }
@@ -1374,6 +1384,13 @@ class BoardPanel extends JPanel {
         lastToR = m.toR;
         lastToC = m.toC;
 
+        // Update halfmove clock (resets on pawn move or capture)
+        if (piece.type == PieceType.PAWN || captured != null || m.isEnPassant) {
+            halfmoveClock = 0;
+        } else {
+            halfmoveClock++;
+        }
+
         if (captured != null || m.isEnPassant) {
             playSound("capture");
         } else {
@@ -1392,6 +1409,11 @@ class BoardPanel extends JPanel {
             gameView.updateMaterialEvaluation(board);
         }
 
+        // Record position for threefold repetition detection
+        String posKey = generatePositionKey();
+        int posCount = positionHistory.containsKey(posKey) ? positionHistory.get(posKey) + 1 : 1;
+        positionHistory.put(posKey, posCount);
+
         // Check for checkmate or stalemate
         List<Move> nextLegalMoves = getAllLegalMoves(currentTurn, board, epRow, epCol);
         boolean inCheck = isKingInCheck(currentTurn, board);
@@ -1407,6 +1429,21 @@ class BoardPanel extends JPanel {
                 gameView.updateStatus("Stalemate - Draw (½ - ½)", new Color(220, 220, 100));
                 gameView.showGameOverDialog("Draw", "Stalemate", "½ - ½");
             }
+        } else if (isInsufficientMaterial()) {
+            // Insufficient material draw (e.g. King vs King)
+            gameOver = true;
+            gameView.updateStatus("Draw - Insufficient Material (½ - ½)", new Color(220, 220, 100));
+            gameView.showGameOverDialog("Draw", "Insufficient Material", "½ - ½");
+        } else if (posCount >= 3) {
+            // Threefold repetition draw
+            gameOver = true;
+            gameView.updateStatus("Draw - Threefold Repetition (½ - ½)", new Color(220, 220, 100));
+            gameView.showGameOverDialog("Draw", "Threefold Repetition", "½ - ½");
+        } else if (halfmoveClock >= 100) {
+            // 50-move rule draw (100 half-moves = 50 full moves)
+            gameOver = true;
+            gameView.updateStatus("Draw - 50 Move Rule (½ - ½)", new Color(220, 220, 100));
+            gameView.showGameOverDialog("Draw", "50-Move Rule", "½ - ½");
         } else {
             if (inCheck) {
                 gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + " is in Check!", new Color(245, 100, 100));
@@ -1414,6 +1451,88 @@ class BoardPanel extends JPanel {
                 gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + "'s Turn", null);
             }
         }
+    }
+
+    /**
+     * Generates a position key for repetition tracking.
+     * Uses piece placement + current turn + castling rights + en passant.
+     */
+    private String generatePositionKey() {
+        StringBuilder sb = new StringBuilder();
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                ChessPiece p = board[r][c];
+                if (p == null) {
+                    sb.append('.');
+                } else {
+                    char ch;
+                    switch (p.type) {
+                        case PAWN: ch = 'p'; break;
+                        case KNIGHT: ch = 'n'; break;
+                        case BISHOP: ch = 'b'; break;
+                        case ROOK: ch = 'r'; break;
+                        case QUEEN: ch = 'q'; break;
+                        case KING: ch = 'k'; break;
+                        default: ch = '?';
+                    }
+                    sb.append(p.color == PieceColor.WHITE ? Character.toUpperCase(ch) : ch);
+                }
+            }
+        }
+        sb.append(currentTurn == PieceColor.WHITE ? 'w' : 'b');
+        sb.append(epRow).append(epCol);
+        return sb.toString();
+    }
+
+    /**
+     * Checks if the board has insufficient material for either side to checkmate.
+     * Covers: K vs K, K+B vs K, K+N vs K, K+B vs K+B (same color bishops).
+     */
+    private boolean isInsufficientMaterial() {
+        List<ChessPiece> whitePieces = new ArrayList<>();
+        List<ChessPiece> blackPieces = new ArrayList<>();
+        int whiteBishopColorSum = 0;
+        int blackBishopColorSum = 0;
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                ChessPiece p = board[r][c];
+                if (p == null) continue;
+                if (p.type == PieceType.KING) continue; // Don't count kings
+                if (p.color == PieceColor.WHITE) {
+                    whitePieces.add(p);
+                    if (p.type == PieceType.BISHOP) whiteBishopColorSum += (r + c) % 2;
+                } else {
+                    blackPieces.add(p);
+                    if (p.type == PieceType.BISHOP) blackBishopColorSum += (r + c) % 2;
+                }
+            }
+        }
+
+        int wCount = whitePieces.size();
+        int bCount = blackPieces.size();
+
+        // K vs K
+        if (wCount == 0 && bCount == 0) return true;
+
+        // K+minor vs K
+        if (wCount == 0 && bCount == 1) {
+            PieceType t = blackPieces.get(0).type;
+            if (t == PieceType.BISHOP || t == PieceType.KNIGHT) return true;
+        }
+        if (bCount == 0 && wCount == 1) {
+            PieceType t = whitePieces.get(0).type;
+            if (t == PieceType.BISHOP || t == PieceType.KNIGHT) return true;
+        }
+
+        // K+B vs K+B (same color bishops only)
+        if (wCount == 1 && bCount == 1) {
+            if (whitePieces.get(0).type == PieceType.BISHOP && blackPieces.get(0).type == PieceType.BISHOP) {
+                if (whiteBishopColorSum == blackBishopColorSum) return true;
+            }
+        }
+
+        return false;
     }
 
     public String generateFEN() {
