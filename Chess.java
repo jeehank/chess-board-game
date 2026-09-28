@@ -445,19 +445,23 @@ class MenuView extends JPanel {
         btnPanel.setOpaque(false);
 
         JButton cancelBtn = new JButton("Cancel");
+        cancelBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         cancelBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         cancelBtn.setBackground(new Color(60, 58, 54));
-        cancelBtn.setForeground(Color.BLACK);
+        cancelBtn.setForeground(Color.WHITE);
         cancelBtn.setFocusPainted(false);
+        cancelBtn.setOpaque(true);
         cancelBtn.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
         cancelBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         cancelBtn.addActionListener(e -> dialog.dispose());
 
         JButton startBtn = new JButton("Start Duel ⚔");
+        startBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         startBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         startBtn.setBackground(new Color(129, 182, 76));
-        startBtn.setForeground(Color.BLACK);
+        startBtn.setForeground(Color.WHITE);
         startBtn.setFocusPainted(false);
+        startBtn.setOpaque(true);
         startBtn.setBorder(BorderFactory.createEmptyBorder(8, 22, 8, 22));
         startBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         startBtn.addActionListener(e -> {
