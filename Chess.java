@@ -17,7 +17,7 @@ public class Chess extends JFrame {
     private GameView gameView;
 
     public Chess() {
-        setTitle("Chess - Classic Game");
+        setTitle("Chess - Army Variants & Classic Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         getContentPane().setBackground(new Color(48, 46, 43)); // Chess.com dark brown
 
@@ -46,18 +46,26 @@ public class Chess extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    public void startNormalGame() {
-        gameView.startNewGame(false);
+    public void startGame(GameMode mode, boolean timed) {
+        gameView.startNewGame(mode, timed);
         cardLayout.show(mainContainer, "GAME");
         pack();
         setLocationRelativeTo(null);
     }
 
-    public void startTimedGame() {
-        gameView.startNewGame(true);
+    public void startCustomGame(PieceType whitePiece, PieceType blackPiece, boolean timed) {
+        gameView.startNewCustomGame(whitePiece, blackPiece, timed);
         cardLayout.show(mainContainer, "GAME");
         pack();
         setLocationRelativeTo(null);
+    }
+
+    public void startNormalGame() {
+        startGame(GameMode.CLASSIC, false);
+    }
+
+    public void startTimedGame() {
+        startGame(GameMode.CLASSIC, true);
     }
 
     public static void main(String[] args) {
@@ -71,71 +79,404 @@ public class Chess extends JFrame {
     }
 }
 
-class MenuView extends JPanel {
-    public MenuView(Chess mainFrame) {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setBackground(new Color(48, 46, 43));
-        setPreferredSize(new Dimension(680, 780));
-        setBorder(BorderFactory.createEmptyBorder(60, 40, 60, 40));
+enum GameMode {
+    CLASSIC("Classic Chess", "Standard traditional FIDE setup & rules", "👑", new Color(233, 196, 106), null, null),
+    ALL_PAWNS("Pawns Only", "1 King + 15 Pawns on both sides. A massive pawn war!", "♟", new Color(129, 182, 76), PieceType.PAWN, PieceType.PAWN),
+    ALL_BISHOPS("Bishops Only", "1 King + 15 Bishops on both sides. Diagonal snipers!", "♝", new Color(42, 157, 143), PieceType.BISHOP, PieceType.BISHOP),
+    ALL_KNIGHTS("Knights Only", "1 King + 15 Knights on both sides. Wild jumping combat!", "♞", new Color(231, 111, 81), PieceType.KNIGHT, PieceType.KNIGHT),
+    ALL_ROOKS("Rooks Only", "1 King + 15 Rooks on both sides. Heavy artillery fortress!", "♜", new Color(69, 123, 157), PieceType.ROOK, PieceType.ROOK),
+    ALL_QUEENS("Queens Only", "1 King + 15 Queens on both sides. Ultimate royal mayhem!", "♛", new Color(155, 93, 229), PieceType.QUEEN, PieceType.QUEEN),
+    CUSTOM("Custom Duel", "Choose custom army piece types for White & Black!", "⚔", new Color(230, 57, 70), null, null);
 
-        // Title icon / crown
-        JLabel titleLabel = new JLabel("CHESS", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Poppins", Font.BOLD, 52));
+    final String title;
+    final String description;
+    final String icon;
+    final Color accentColor;
+    final PieceType defaultWhite;
+    final PieceType defaultBlack;
+
+    GameMode(String title, String description, String icon, Color accentColor, PieceType defaultWhite, PieceType defaultBlack) {
+        this.title = title;
+        this.description = description;
+        this.icon = icon;
+        this.accentColor = accentColor;
+        this.defaultWhite = defaultWhite;
+        this.defaultBlack = defaultBlack;
+    }
+}
+
+class MenuView extends JPanel {
+    private Chess mainFrame;
+    private boolean isTimedSelected = false;
+    private JButton casualBtn;
+    private JButton blitzBtn;
+
+    public MenuView(Chess mainFrame) {
+        this.mainFrame = mainFrame;
+        setLayout(new BorderLayout());
+        setBackground(new Color(48, 46, 43));
+        setPreferredSize(new Dimension(684, 848));
+        setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
+
+        JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+        container.setOpaque(false);
+
+        // Header
+        JLabel crownLabel = new JLabel("👑", SwingConstants.CENTER);
+        crownLabel.setFont(new Font("Segoe UI", Font.PLAIN, 38));
+        crownLabel.setForeground(new Color(233, 196, 106));
+        crownLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel titleLabel = new JLabel("CHESS BATTLES", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 40));
         titleLabel.setForeground(new Color(245, 245, 245));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitleLabel = new JLabel("Classic Board Game", SwingConstants.CENTER);
-        subtitleLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
+        JLabel subtitleLabel = new JLabel("Army Variants & Classic Board Game", SwingConstants.CENTER);
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         subtitleLabel.setForeground(new Color(160, 155, 145));
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        add(Box.createVerticalGlue());
-        add(titleLabel);
-        add(Box.createRigidArea(new Dimension(0, 8)));
-        add(subtitleLabel);
-        add(Box.createRigidArea(new Dimension(0, 50)));
+        container.add(Box.createVerticalGlue());
+        container.add(crownLabel);
+        container.add(titleLabel);
+        container.add(Box.createRigidArea(new Dimension(0, 4)));
+        container.add(subtitleLabel);
+        container.add(Box.createRigidArea(new Dimension(0, 22)));
 
-        // Buttons
-        JButton normalBtn = createMenuButton("Play Normal Game", "Play without time pressure (Unlimited Time)", new Color(129, 182, 76));
-        normalBtn.addActionListener(e -> mainFrame.startNormalGame());
+        // Time Control Toggle
+        JLabel timeHeader = new JLabel("TIME CONTROL", SwingConstants.CENTER);
+        timeHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        timeHeader.setForeground(new Color(170, 165, 155));
+        timeHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+        container.add(timeHeader);
+        container.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        JButton timedBtn = createMenuButton("Play 10 Min Blitz", "Each player gets 10 minutes (Rapid Clock)", new Color(69, 123, 157));
-        timedBtn.addActionListener(e -> mainFrame.startTimedGame());
+        JPanel timeBtnRow = new JPanel(new GridLayout(1, 2, 12, 0));
+        timeBtnRow.setOpaque(false);
+        timeBtnRow.setMaximumSize(new Dimension(520, 46));
+        timeBtnRow.setPreferredSize(new Dimension(520, 46));
+        timeBtnRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        add(normalBtn);
-        add(Box.createRigidArea(new Dimension(0, 24)));
-        add(timedBtn);
-        add(Box.createVerticalGlue());
+        casualBtn = createTimeButton("🕊️  Casual (Unlimited)", !isTimedSelected);
+        blitzBtn = createTimeButton("⚡  10 Min Blitz", isTimedSelected);
 
-        JLabel footer = new JLabel("Powered by Stockfish 16 Engine • Chess.com Style", SwingConstants.CENTER);
-        footer.setFont(new Font("Poppins", Font.PLAIN, 12));
+        casualBtn.addActionListener(e -> {
+            isTimedSelected = false;
+            updateTimeButtonStyles();
+        });
+
+        blitzBtn.addActionListener(e -> {
+            isTimedSelected = true;
+            updateTimeButtonStyles();
+        });
+
+        timeBtnRow.add(casualBtn);
+        timeBtnRow.add(blitzBtn);
+        container.add(timeBtnRow);
+        container.add(Box.createRigidArea(new Dimension(0, 24)));
+
+        // Game Modes Grid
+        JLabel modeHeader = new JLabel("SELECT GAME MODE", SwingConstants.CENTER);
+        modeHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        modeHeader.setForeground(new Color(170, 165, 155));
+        modeHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+        container.add(modeHeader);
+        container.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        JPanel gridPanel = new JPanel(new GridLayout(3, 2, 12, 10));
+        gridPanel.setOpaque(false);
+        gridPanel.setMaximumSize(new Dimension(620, 230));
+        gridPanel.setPreferredSize(new Dimension(620, 230));
+        gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        GameMode[] standardModes = {
+            GameMode.ALL_PAWNS, GameMode.ALL_BISHOPS,
+            GameMode.ALL_KNIGHTS, GameMode.ALL_ROOKS,
+            GameMode.ALL_QUEENS, GameMode.CLASSIC
+        };
+
+        for (final GameMode gm : standardModes) {
+            JButton cardBtn = createModeCard(gm);
+            cardBtn.addActionListener(e -> mainFrame.startGame(gm, isTimedSelected));
+            gridPanel.add(cardBtn);
+        }
+        container.add(gridPanel);
+        container.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Custom Matchup Card
+        JButton customBtn = createCustomDuelCard();
+        customBtn.addActionListener(e -> showCustomDuelDialog());
+        container.add(customBtn);
+        container.add(Box.createRigidArea(new Dimension(0, 24)));
+
+        // Footer
+        JLabel footer = new JLabel("Stockfish 16 Engine • Dynamic Evaluation • Chess.com Style", SwingConstants.CENTER);
+        footer.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         footer.setForeground(new Color(120, 115, 105));
         footer.setAlignmentX(Component.CENTER_ALIGNMENT);
-        add(footer);
+        container.add(footer);
+        container.add(Box.createVerticalGlue());
+
+        add(container, BorderLayout.CENTER);
     }
 
-    private JButton createMenuButton(String mainText, String subText, Color bgColor) {
-        JButton btn = new JButton();
-        btn.setLayout(new BorderLayout());
-        btn.setBackground(bgColor);
-        btn.setForeground(Color.BLACK);
+    private JButton createTimeButton(String text, boolean active) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setFocusPainted(false);
-        btn.setBorder(BorderFactory.createEmptyBorder(16, 24, 16, 24));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setMaximumSize(new Dimension(450, 80));
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel title = new JLabel(mainText, SwingConstants.CENTER);
-        title.setFont(new Font("Poppins", Font.BOLD, 20));
-        title.setForeground(Color.BLACK);
-
-        JLabel sub = new JLabel(subText, SwingConstants.CENTER);
-        sub.setFont(new Font("Poppins", Font.PLAIN, 12));
-        sub.setForeground(new Color(50, 50, 50));
-
-        btn.add(title, BorderLayout.NORTH);
-        btn.add(sub, BorderLayout.SOUTH);
+        applyTimeButtonStyle(btn, active);
         return btn;
+    }
+
+    private void applyTimeButtonStyle(JButton btn, boolean active) {
+        if (active) {
+            btn.setBackground(new Color(129, 182, 76)); // Chess.com green
+            btn.setForeground(Color.WHITE);
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(160, 210, 100), 2),
+                BorderFactory.createEmptyBorder(8, 14, 8, 14)
+            ));
+        } else {
+            btn.setBackground(new Color(38, 36, 33));
+            btn.setForeground(new Color(180, 175, 165));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
+                BorderFactory.createEmptyBorder(8, 14, 8, 14)
+            ));
+        }
+    }
+
+    private void updateTimeButtonStyles() {
+        applyTimeButtonStyle(casualBtn, !isTimedSelected);
+        applyTimeButtonStyle(blitzBtn, isTimedSelected);
+    }
+
+    private JButton createModeCard(final GameMode mode) {
+        final JButton btn = new JButton();
+        btn.setLayout(new BorderLayout(10, 0));
+        btn.setBackground(new Color(38, 36, 33));
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
+            BorderFactory.createEmptyBorder(8, 12, 8, 12)
+        ));
+
+        // Left Icon
+        JLabel iconLbl = new JLabel(mode.icon, SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI", Font.PLAIN, 28));
+        iconLbl.setForeground(mode.accentColor);
+        iconLbl.setPreferredSize(new Dimension(36, 36));
+
+        // Text Content
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setOpaque(false);
+
+        JLabel titleLbl = new JLabel(mode.title);
+        titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        titleLbl.setForeground(new Color(245, 245, 245));
+
+        JLabel descLbl = new JLabel(mode.description);
+        descLbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        descLbl.setForeground(new Color(160, 155, 145));
+
+        textPanel.add(titleLbl);
+        textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        textPanel.add(descLbl);
+
+        btn.add(iconLbl, BorderLayout.WEST);
+        btn.add(textPanel, BorderLayout.CENTER);
+
+        // Hover Effect
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(new Color(52, 50, 46));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(mode.accentColor, 1),
+                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                ));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(new Color(38, 36, 33));
+                btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
+                    BorderFactory.createEmptyBorder(8, 12, 8, 12)
+                ));
+            }
+        });
+
+        return btn;
+    }
+
+    private JButton createCustomDuelCard() {
+        final JButton btn = new JButton();
+        btn.setLayout(new BorderLayout(12, 0));
+        btn.setBackground(new Color(38, 36, 33));
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setMaximumSize(new Dimension(620, 56));
+        btn.setPreferredSize(new Dimension(620, 56));
+        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btn.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(230, 57, 70), 1),
+            BorderFactory.createEmptyBorder(8, 16, 8, 16)
+        ));
+
+        JLabel iconLbl = new JLabel("⚔", SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI", Font.PLAIN, 28));
+        iconLbl.setForeground(new Color(230, 57, 70));
+        iconLbl.setPreferredSize(new Dimension(36, 36));
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setOpaque(false);
+
+        JLabel titleLbl = new JLabel("Custom Army Duel (Mix & Match)");
+        titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        titleLbl.setForeground(new Color(245, 245, 245));
+
+        JLabel descLbl = new JLabel("Select custom piece types for White and Black armies (e.g. Bishops vs Knights)");
+        descLbl.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        descLbl.setForeground(new Color(160, 155, 145));
+
+        textPanel.add(titleLbl);
+        textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        textPanel.add(descLbl);
+
+        JLabel arrowLbl = new JLabel("Setup ▶");
+        arrowLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        arrowLbl.setForeground(new Color(230, 57, 70));
+
+        btn.add(iconLbl, BorderLayout.WEST);
+        btn.add(textPanel, BorderLayout.CENTER);
+        btn.add(arrowLbl, BorderLayout.EAST);
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(new Color(55, 45, 45));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(new Color(38, 36, 33));
+            }
+        });
+
+        return btn;
+    }
+
+    private void showCustomDuelDialog() {
+        final JDialog dialog = new JDialog(mainFrame, "Custom Army Duel", true);
+        dialog.setLayout(new BorderLayout());
+        dialog.getContentPane().setBackground(new Color(38, 36, 33));
+
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(new Color(38, 36, 33));
+        content.setBorder(BorderFactory.createEmptyBorder(24, 30, 24, 30));
+
+        JLabel titleLbl = new JLabel("CUSTOM ARMY DUEL", SwingConstants.CENTER);
+        titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        titleLbl.setForeground(new Color(245, 245, 245));
+        titleLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subLbl = new JLabel("Choose army piece type for each side (1 King + 15 Pieces):", SwingConstants.CENTER);
+        subLbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        subLbl.setForeground(new Color(160, 155, 145));
+        subLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        content.add(titleLbl);
+        content.add(Box.createRigidArea(new Dimension(0, 6)));
+        content.add(subLbl);
+        content.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        String[] options = {
+            "♟ Pawns (1 King + 15 Pawns)",
+            "♝ Bishops (1 King + 15 Bishops)",
+            "♞ Knights (1 King + 15 Knights)",
+            "♜ Rooks (1 King + 15 Rooks)",
+            "♛ Queens (1 King + 15 Queens)",
+            "👑 Classic Traditional Army"
+        };
+        final PieceType[] pieceMap = {
+            PieceType.PAWN,
+            PieceType.BISHOP,
+            PieceType.KNIGHT,
+            PieceType.ROOK,
+            PieceType.QUEEN,
+            null
+        };
+
+        // White selection
+        JLabel wLbl = new JLabel("White Army (You):");
+        wLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        wLbl.setForeground(new Color(230, 230, 230));
+        final JComboBox<String> whiteCombo = new JComboBox<>(options);
+        whiteCombo.setSelectedIndex(1); // default Bishops
+        whiteCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        whiteCombo.setMaximumSize(new Dimension(380, 34));
+
+        // Black selection
+        JLabel bLbl = new JLabel("Black Army (Opponent):");
+        bLbl.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        bLbl.setForeground(new Color(230, 230, 230));
+        final JComboBox<String> blackCombo = new JComboBox<>(options);
+        blackCombo.setSelectedIndex(0); // default Pawns
+        blackCombo.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        blackCombo.setMaximumSize(new Dimension(380, 34));
+
+        JPanel formPanel = new JPanel(new GridLayout(4, 1, 0, 6));
+        formPanel.setOpaque(false);
+        formPanel.setMaximumSize(new Dimension(380, 140));
+        formPanel.add(wLbl);
+        formPanel.add(whiteCombo);
+        formPanel.add(bLbl);
+        formPanel.add(blackCombo);
+        content.add(formPanel);
+
+        content.add(Box.createRigidArea(new Dimension(0, 24)));
+
+        // Buttons
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 0));
+        btnPanel.setOpaque(false);
+
+        JButton cancelBtn = new JButton("Cancel");
+        cancelBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        cancelBtn.setBackground(new Color(60, 58, 54));
+        cancelBtn.setForeground(Color.WHITE);
+        cancelBtn.setFocusPainted(false);
+        cancelBtn.setBorder(BorderFactory.createEmptyBorder(8, 18, 8, 18));
+        cancelBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        cancelBtn.addActionListener(e -> dialog.dispose());
+
+        JButton startBtn = new JButton("Start Duel ⚔");
+        startBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        startBtn.setBackground(new Color(129, 182, 76));
+        startBtn.setForeground(Color.WHITE);
+        startBtn.setFocusPainted(false);
+        startBtn.setBorder(BorderFactory.createEmptyBorder(8, 22, 8, 22));
+        startBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        startBtn.addActionListener(e -> {
+            PieceType wP = pieceMap[whiteCombo.getSelectedIndex()];
+            PieceType bP = pieceMap[blackCombo.getSelectedIndex()];
+            dialog.dispose();
+            mainFrame.startCustomGame(wP, bP, isTimedSelected);
+        });
+
+        btnPanel.add(cancelBtn);
+        btnPanel.add(startBtn);
+        content.add(btnPanel);
+
+        dialog.add(content, BorderLayout.CENTER);
+        dialog.pack();
+        dialog.setLocationRelativeTo(mainFrame);
+        dialog.setVisible(true);
     }
 }
 
@@ -145,10 +486,18 @@ class GameView extends JPanel {
     private EvaluationBar evaluationBar;
 
     private JLabel statusLabel;
+    private JLabel modeLabel;
     private JLabel whiteClockLabel;
     private JLabel blackClockLabel;
+    private JLabel whiteNameLabel;
+    private JLabel blackNameLabel;
     private JPanel whitePlayerBox;
     private JPanel blackPlayerBox;
+
+    private GameMode currentGameMode = GameMode.CLASSIC;
+    private PieceType currentWhiteArmy = null;
+    private PieceType currentBlackArmy = null;
+    private String currentModeName = "Classic Chess";
 
     private boolean isTimedMode = false;
     private int whiteTimeSeconds = 600; // 10 minutes
@@ -161,45 +510,61 @@ class GameView extends JPanel {
         setBackground(new Color(48, 46, 43));
         setBorder(BorderFactory.createEmptyBorder(10, 14, 12, 14));
 
-        // 1. Top Bar: Menu Button, Status Label, Reset Button
+        // 1. Top Bar: Menu Button, Center Status & Mode, Restart Button
         JPanel topHeader = new JPanel(new BorderLayout());
         topHeader.setBackground(new Color(38, 36, 33));
         topHeader.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
 
         JButton backBtn = new JButton("◀ Menu");
-        backBtn.setFont(new Font("Poppins", Font.BOLD, 13));
-        backBtn.setBackground(new Color(70, 68, 65));
-        backBtn.setForeground(Color.WHITE);
+        backBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        backBtn.setBackground(new Color(230, 230, 230));
+        backBtn.setForeground(Color.BLACK);
         backBtn.setFocusPainted(false);
         backBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
         backBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backBtn.addActionListener(e -> mainFrame.showMenu());
         topHeader.add(backBtn, BorderLayout.WEST);
 
+        // Center Panel
+        JPanel centerStatusPanel = new JPanel();
+        centerStatusPanel.setLayout(new BoxLayout(centerStatusPanel, BoxLayout.Y_AXIS));
+        centerStatusPanel.setOpaque(false);
+
         statusLabel = new JLabel("White's Turn", SwingConstants.CENTER);
         statusLabel.setForeground(new Color(245, 245, 245));
-        statusLabel.setFont(new Font("Poppins", Font.BOLD, 17));
-        topHeader.add(statusLabel, BorderLayout.CENTER);
+        statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 17));
+        statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        modeLabel = new JLabel("👑 Classic Chess • Casual", SwingConstants.CENTER);
+        modeLabel.setForeground(new Color(170, 165, 155));
+        modeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        modeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        centerStatusPanel.add(statusLabel);
+        centerStatusPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        centerStatusPanel.add(modeLabel);
+        topHeader.add(centerStatusPanel, BorderLayout.CENTER);
 
         JButton resetBtn = new JButton("Restart");
-        resetBtn.setFont(new Font("Poppins", Font.BOLD, 13));
-        resetBtn.setBackground(new Color(129, 182, 76));
-        resetBtn.setForeground(Color.WHITE);
+        resetBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        resetBtn.setBackground(new Color(230, 230, 230));
+        resetBtn.setForeground(Color.BLACK);
         resetBtn.setFocusPainted(false);
         resetBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
         resetBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        resetBtn.addActionListener(e -> startNewGame(isTimedMode));
+        resetBtn.addActionListener(e -> restartCurrentGame());
         topHeader.add(resetBtn, BorderLayout.EAST);
 
         add(topHeader, BorderLayout.NORTH);
 
-        // Center Panel: Black Info, Board, White Info, Evaluation Bar
+        // Center Container: Black Info, Board, White Info, Evaluation Bar
         JPanel centerContainer = new JPanel();
         centerContainer.setLayout(new BoxLayout(centerContainer, BoxLayout.Y_AXIS));
         centerContainer.setBackground(new Color(48, 46, 43));
 
         // Black Player Bar
-        blackPlayerBox = createPlayerBar("Black (Opponent)", false);
+        blackNameLabel = new JLabel("Black (Opponent) • Classic");
+        blackPlayerBox = createPlayerBar(blackNameLabel, false);
         blackClockLabel = new JLabel("10:00", SwingConstants.RIGHT);
         styleClockLabel(blackClockLabel);
         blackPlayerBox.add(blackClockLabel, BorderLayout.EAST);
@@ -212,7 +577,8 @@ class GameView extends JPanel {
         centerContainer.add(Box.createRigidArea(new Dimension(0, 4)));
 
         // White Player Bar
-        whitePlayerBox = createPlayerBar("White (You)", true);
+        whiteNameLabel = new JLabel("White (You) • Classic");
+        whitePlayerBox = createPlayerBar(whiteNameLabel, true);
         whiteClockLabel = new JLabel("10:00", SwingConstants.RIGHT);
         styleClockLabel(whiteClockLabel);
         whitePlayerBox.add(whiteClockLabel, BorderLayout.EAST);
@@ -229,7 +595,7 @@ class GameView extends JPanel {
         gameClockTimer = new javax.swing.Timer(1000, e -> tickClock());
     }
 
-    private JPanel createPlayerBar(String name, boolean isWhite) {
+    private JPanel createPlayerBar(JLabel nameLbl, boolean isWhite) {
         JPanel bar = new JPanel(new BorderLayout());
         bar.setBackground(new Color(38, 36, 33));
         bar.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
@@ -239,39 +605,79 @@ class GameView extends JPanel {
         left.setOpaque(false);
 
         JLabel avatar = new JLabel(isWhite ? "⚪" : "⚫");
-        avatar.setFont(new Font("Poppins", Font.PLAIN, 15));
+        avatar.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 
-        JLabel nameLabel = new JLabel(name);
-        nameLabel.setFont(new Font("Poppins", Font.BOLD, 14));
-        nameLabel.setForeground(new Color(230, 230, 230));
+        nameLbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        nameLbl.setForeground(new Color(230, 230, 230));
 
         left.add(avatar);
-        left.add(nameLabel);
+        left.add(nameLbl);
         bar.add(left, BorderLayout.WEST);
         return bar;
     }
 
     private void styleClockLabel(JLabel lbl) {
-        lbl.setFont(new Font("Poppins", Font.BOLD, 16));
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 16));
         lbl.setForeground(new Color(245, 245, 245));
         lbl.setBackground(new Color(25, 24, 22));
         lbl.setOpaque(true);
         lbl.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
     }
 
+    public void startNewGame(GameMode mode, boolean timed) {
+        this.currentGameMode = mode;
+        this.isTimedMode = timed;
+        this.currentWhiteArmy = mode.defaultWhite;
+        this.currentBlackArmy = mode.defaultBlack;
+        this.currentModeName = mode.title;
+        applyGameStart();
+    }
+
+    public void startNewCustomGame(PieceType whitePiece, PieceType blackPiece, boolean timed) {
+        this.currentGameMode = GameMode.CUSTOM;
+        this.isTimedMode = timed;
+        this.currentWhiteArmy = whitePiece;
+        this.currentBlackArmy = blackPiece;
+        String wStr = (whitePiece == null) ? "Classic" : whitePiece.name().substring(0, 1) + whitePiece.name().substring(1).toLowerCase() + "s";
+        String bStr = (blackPiece == null) ? "Classic" : blackPiece.name().substring(0, 1) + blackPiece.name().substring(1).toLowerCase() + "s";
+        this.currentModeName = wStr + " vs " + bStr;
+        applyGameStart();
+    }
+
     public void startNewGame(boolean timed) {
         this.isTimedMode = timed;
+        applyGameStart();
+    }
+
+    public void restartCurrentGame() {
+        applyGameStart();
+    }
+
+    private void applyGameStart() {
         whiteTimeSeconds = 600;
         blackTimeSeconds = 600;
         updateClockDisplay();
 
-        whiteClockLabel.setVisible(timed);
-        blackClockLabel.setVisible(timed);
+        whiteClockLabel.setVisible(isTimedMode);
+        blackClockLabel.setVisible(isTimedMode);
 
-        boardPanel.resetGame();
+        modeLabel.setText(currentGameMode.icon + " " + currentModeName + (isTimedMode ? " • 10m Blitz" : " • Casual"));
+
+        String wArmyStr = (currentWhiteArmy == null) ? "Classic" : (currentWhiteArmy.name().substring(0, 1) + currentWhiteArmy.name().substring(1).toLowerCase() + "s");
+        String bArmyStr = (currentBlackArmy == null) ? "Classic" : (currentBlackArmy.name().substring(0, 1) + currentBlackArmy.name().substring(1).toLowerCase() + "s");
+        whiteNameLabel.setText("White (You) • " + wArmyStr);
+        blackNameLabel.setText("Black (Opponent) • " + bArmyStr);
+
+        boardPanel.resetGame(currentGameMode, currentWhiteArmy, currentBlackArmy);
         evaluationBar.resetEvaluation();
 
-        if (timed) {
+        if (currentGameMode == GameMode.CLASSIC && currentWhiteArmy == null && currentBlackArmy == null) {
+            requestEvaluation(boardPanel.generateFEN());
+        } else {
+            updateMaterialEvaluation(boardPanel.getBoard());
+        }
+
+        if (isTimedMode) {
             gameClockTimer.restart();
         } else {
             gameClockTimer.stop();
@@ -346,9 +752,13 @@ class GameView extends JPanel {
         evaluationBar.fetchEvaluation(fen);
     }
 
+    public void updateMaterialEvaluation(ChessPiece[][] board) {
+        evaluationBar.updateMaterialEvaluation(board);
+    }
+
     public void showGameOverDialog(String winner, String reason, String score) {
         stopTimer();
-        JDialog dialog = new JDialog(mainFrame, "Game Over", true);
+        final JDialog dialog = new JDialog(mainFrame, "Game Over", true);
         dialog.setLayout(new BorderLayout());
         dialog.getContentPane().setBackground(new Color(38, 36, 33));
 
@@ -358,18 +768,18 @@ class GameView extends JPanel {
         content.setBorder(BorderFactory.createEmptyBorder(28, 40, 28, 40));
 
         JLabel titleLbl = new JLabel("GAME OVER", SwingConstants.CENTER);
-        titleLbl.setFont(new Font("Poppins", Font.BOLD, 28));
+        titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLbl.setForeground(new Color(245, 245, 245));
         titleLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         String verdictText = winner.equals("Draw") ? "Game Drawn (" + reason + ")" : winner + " Won " + reason + "!";
         JLabel verdictLbl = new JLabel(verdictText, SwingConstants.CENTER);
-        verdictLbl.setFont(new Font("Poppins", Font.BOLD, 18));
+        verdictLbl.setFont(new Font("Segoe UI", Font.BOLD, 18));
         verdictLbl.setForeground(new Color(129, 182, 76));
         verdictLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel scoreLbl = new JLabel(score, SwingConstants.CENTER);
-        scoreLbl.setFont(new Font("Poppins", Font.BOLD, 46));
+        scoreLbl.setFont(new Font("Segoe UI", Font.BOLD, 46));
         scoreLbl.setForeground(Color.WHITE);
         scoreLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -384,21 +794,21 @@ class GameView extends JPanel {
         btnPanel.setOpaque(false);
 
         JButton playAgainBtn = new JButton("Play Again");
-        playAgainBtn.setFont(new Font("Poppins", Font.BOLD, 14));
-        playAgainBtn.setBackground(new Color(129, 182, 76));
-        playAgainBtn.setForeground(Color.WHITE);
+        playAgainBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        playAgainBtn.setBackground(new Color(230, 230, 230));
+        playAgainBtn.setForeground(Color.BLACK);
         playAgainBtn.setFocusPainted(false);
         playAgainBtn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         playAgainBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         playAgainBtn.addActionListener(e -> {
             dialog.dispose();
-            startNewGame(isTimedMode);
+            restartCurrentGame();
         });
 
         JButton menuBtn = new JButton("Main Menu");
-        menuBtn.setFont(new Font("Poppins", Font.BOLD, 14));
-        menuBtn.setBackground(new Color(70, 68, 65));
-        menuBtn.setForeground(Color.WHITE);
+        menuBtn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        menuBtn.setBackground(new Color(230, 230, 230));
+        menuBtn.setForeground(Color.BLACK);
         menuBtn.setFocusPainted(false);
         menuBtn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         menuBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -423,6 +833,7 @@ class EvaluationBar extends JPanel {
     private double winChance = 50.0; // 0% to 100% for White
     private Integer mateIn = null; // null or number of moves to mate
     private String statusText = "0.0";
+    private String engineName = "Stockfish 16";
     private int currentReqId = 0;
 
     public EvaluationBar() {
@@ -436,6 +847,40 @@ class EvaluationBar extends JPanel {
         winChance = 50.0;
         mateIn = null;
         statusText = "0.0";
+        engineName = "Stockfish 16";
+        repaint();
+    }
+
+    public void updateMaterialEvaluation(ChessPiece[][] board) {
+        int whiteVal = 0;
+        int blackVal = 0;
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                ChessPiece p = board[r][c];
+                if (p != null) {
+                    int val = 0;
+                    switch (p.type) {
+                        case PAWN: val = 1; break;
+                        case KNIGHT: val = 3; break;
+                        case BISHOP: val = 3; break;
+                        case ROOK: val = 5; break;
+                        case QUEEN: val = 9; break;
+                        case KING: val = 0; break;
+                    }
+                    if (p.color == PieceColor.WHITE) whiteVal += val;
+                    else blackVal += val;
+                }
+            }
+        }
+        double diff = whiteVal - blackVal;
+        double wc = 50.0 + (diff * 4.0);
+        wc = Math.max(4.0, Math.min(96.0, wc));
+
+        this.eval = diff;
+        this.winChance = wc;
+        this.mateIn = null;
+        this.statusText = (diff >= 0 ? "+" : "") + String.format(Locale.US, "%.1f", diff);
+        this.engineName = "Material";
         repaint();
     }
 
@@ -482,21 +927,18 @@ class EvaluationBar extends JPanel {
         if (reqId != currentReqId) return; // Discard outdated requests
 
         try {
-            // Extract "eval": <num>
             Double parsedEval = null;
             Matcher evalMatcher = Pattern.compile("\"eval\":\\s*(-?\\d+(\\.\\d+)?)").matcher(json);
             if (evalMatcher.find()) {
                 parsedEval = Double.parseDouble(evalMatcher.group(1));
             }
 
-            // Extract "winChance": <num>
             Double parsedWinChance = null;
             Matcher winMatcher = Pattern.compile("\"winChance\":\\s*(-?\\d+(\\.\\d+)?)").matcher(json);
             if (winMatcher.find()) {
                 parsedWinChance = Double.parseDouble(winMatcher.group(1));
             }
 
-            // Extract "mate": <num> or null
             Integer parsedMate = null;
             Matcher mateMatcher = Pattern.compile("\"mate\":\\s*(-?\\d+)").matcher(json);
             if (mateMatcher.find()) {
@@ -509,6 +951,7 @@ class EvaluationBar extends JPanel {
 
             SwingUtilities.invokeLater(() -> {
                 if (reqId == currentReqId) {
+                    this.engineName = "Stockfish 16";
                     if (finalMate != null) {
                         this.mateIn = finalMate;
                         this.winChance = (finalMate > 0) ? 100.0 : 0.0;
@@ -554,32 +997,29 @@ class EvaluationBar extends JPanel {
         g2.drawLine(whiteWidth, 0, whiteWidth, h);
 
         // Evaluation text label
-        g2.setFont(new Font("Poppins", Font.BOLD, 13));
+        g2.setFont(new Font("Segoe UI", Font.BOLD, 13));
         FontMetrics fm = g2.getFontMetrics();
         int textW = fm.stringWidth(statusText);
         int textH = fm.getAscent();
 
         if (winChance >= 50.0) {
-            // Text on white side in dark color
             g2.setColor(new Color(30, 30, 30));
             int tx = 14;
             g2.drawString(statusText, tx, (h + textH) / 2 - 2);
         } else {
-            // Text on black side in light color
             g2.setColor(new Color(240, 240, 240));
             int tx = w - textW - 14;
             g2.drawString(statusText, tx, (h + textH) / 2 - 2);
         }
 
         // Subtitle indicator on opposite side
-        g2.setFont(new Font("Poppins", Font.PLAIN, 10));
+        g2.setFont(new Font("Segoe UI", Font.PLAIN, 10));
         g2.setColor(new Color(140, 140, 140));
-        String engineText = "Stockfish 16";
-        int eW = g2.getFontMetrics().stringWidth(engineText);
+        int eW = g2.getFontMetrics().stringWidth(engineName);
         if (winChance >= 50.0) {
-            g2.drawString(engineText, w - eW - 12, (h + 8) / 2);
+            g2.drawString(engineName, w - eW - 12, (h + 8) / 2);
         } else {
-            g2.drawString(engineText, 12, (h + 8) / 2);
+            g2.drawString(engineName, 12, (h + 8) / 2);
         }
     }
 }
@@ -642,6 +1082,10 @@ class BoardPanel extends JPanel {
     private ChessPiece[][] board = new ChessPiece[8][8];
     private Map<String, Image> pieceImages = new HashMap<>();
 
+    private GameMode currentMode = GameMode.CLASSIC;
+    private PieceType whiteArmyType = null;
+    private PieceType blackArmyType = null;
+
     private PieceColor currentTurn = PieceColor.WHITE;
     private int selectedRow = -1;
     private int selectedCol = -1;
@@ -665,7 +1109,7 @@ class BoardPanel extends JPanel {
         setMaximumSize(new Dimension(TILE_SIZE * BOARD_SIZE, TILE_SIZE * BOARD_SIZE));
         setBackground(new Color(48, 46, 43));
         loadPieceImages();
-        resetGame();
+        resetGame(GameMode.CLASSIC, null, null);
 
         MouseAdapter adapter = new MouseAdapter() {
             @Override
@@ -769,6 +1213,10 @@ class BoardPanel extends JPanel {
         this.gameOver = val;
     }
 
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
     private Move getMoveTo(int fromR, int fromC, int toR, int toC) {
         for (Move m : legalMovesForSelected) {
             if (m.toR == toR && m.toC == toC) {
@@ -798,37 +1246,69 @@ class BoardPanel extends JPanel {
     }
 
     public void resetGame() {
+        resetGame(currentMode, whiteArmyType, blackArmyType);
+    }
+
+    public void resetGame(GameMode mode, PieceType whiteArmy, PieceType blackArmy) {
+        this.currentMode = mode;
+        this.whiteArmyType = whiteArmy;
+        this.blackArmyType = blackArmy;
+
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 board[r][c] = null;
             }
         }
 
-        // Black Pieces
-        board[0][0] = new ChessPiece(PieceColor.BLACK, PieceType.ROOK);
-        board[0][1] = new ChessPiece(PieceColor.BLACK, PieceType.KNIGHT);
-        board[0][2] = new ChessPiece(PieceColor.BLACK, PieceType.BISHOP);
-        board[0][3] = new ChessPiece(PieceColor.BLACK, PieceType.QUEEN);
-        board[0][4] = new ChessPiece(PieceColor.BLACK, PieceType.KING);
-        board[0][5] = new ChessPiece(PieceColor.BLACK, PieceType.BISHOP);
-        board[0][6] = new ChessPiece(PieceColor.BLACK, PieceType.KNIGHT);
-        board[0][7] = new ChessPiece(PieceColor.BLACK, PieceType.ROOK);
-        for (int i = 0; i < 8; i++) {
-            board[1][i] = new ChessPiece(PieceColor.BLACK, PieceType.PAWN);
+        // Setup Black Side
+        if (blackArmy == null) {
+            // Traditional Black Pieces
+            board[0][0] = new ChessPiece(PieceColor.BLACK, PieceType.ROOK);
+            board[0][1] = new ChessPiece(PieceColor.BLACK, PieceType.KNIGHT);
+            board[0][2] = new ChessPiece(PieceColor.BLACK, PieceType.BISHOP);
+            board[0][3] = new ChessPiece(PieceColor.BLACK, PieceType.QUEEN);
+            board[0][4] = new ChessPiece(PieceColor.BLACK, PieceType.KING);
+            board[0][5] = new ChessPiece(PieceColor.BLACK, PieceType.BISHOP);
+            board[0][6] = new ChessPiece(PieceColor.BLACK, PieceType.KNIGHT);
+            board[0][7] = new ChessPiece(PieceColor.BLACK, PieceType.ROOK);
+            for (int i = 0; i < 8; i++) {
+                board[1][i] = new ChessPiece(PieceColor.BLACK, PieceType.PAWN);
+            }
+        } else {
+            // Custom Army Setup: 1 King on e8 (0, 4) + 15 custom pieces
+            board[0][4] = new ChessPiece(PieceColor.BLACK, PieceType.KING);
+            for (int c = 0; c < 8; c++) {
+                if (c != 4) {
+                    board[0][c] = new ChessPiece(PieceColor.BLACK, blackArmy);
+                }
+                board[1][c] = new ChessPiece(PieceColor.BLACK, blackArmy);
+            }
         }
 
-        // White Pieces
-        for (int i = 0; i < 8; i++) {
-            board[6][i] = new ChessPiece(PieceColor.WHITE, PieceType.PAWN);
+        // Setup White Side
+        if (whiteArmy == null) {
+            // Traditional White Pieces
+            for (int i = 0; i < 8; i++) {
+                board[6][i] = new ChessPiece(PieceColor.WHITE, PieceType.PAWN);
+            }
+            board[7][0] = new ChessPiece(PieceColor.WHITE, PieceType.ROOK);
+            board[7][1] = new ChessPiece(PieceColor.WHITE, PieceType.KNIGHT);
+            board[7][2] = new ChessPiece(PieceColor.WHITE, PieceType.BISHOP);
+            board[7][3] = new ChessPiece(PieceColor.WHITE, PieceType.QUEEN);
+            board[7][4] = new ChessPiece(PieceColor.WHITE, PieceType.KING);
+            board[7][5] = new ChessPiece(PieceColor.WHITE, PieceType.BISHOP);
+            board[7][6] = new ChessPiece(PieceColor.WHITE, PieceType.KNIGHT);
+            board[7][7] = new ChessPiece(PieceColor.WHITE, PieceType.ROOK);
+        } else {
+            // Custom Army Setup: 1 King on e1 (7, 4) + 15 custom pieces
+            board[7][4] = new ChessPiece(PieceColor.WHITE, PieceType.KING);
+            for (int c = 0; c < 8; c++) {
+                board[6][c] = new ChessPiece(PieceColor.WHITE, whiteArmy);
+                if (c != 4) {
+                    board[7][c] = new ChessPiece(PieceColor.WHITE, whiteArmy);
+                }
+            }
         }
-        board[7][0] = new ChessPiece(PieceColor.WHITE, PieceType.ROOK);
-        board[7][1] = new ChessPiece(PieceColor.WHITE, PieceType.KNIGHT);
-        board[7][2] = new ChessPiece(PieceColor.WHITE, PieceType.BISHOP);
-        board[7][3] = new ChessPiece(PieceColor.WHITE, PieceType.QUEEN);
-        board[7][4] = new ChessPiece(PieceColor.WHITE, PieceType.KING);
-        board[7][5] = new ChessPiece(PieceColor.WHITE, PieceType.BISHOP);
-        board[7][6] = new ChessPiece(PieceColor.WHITE, PieceType.KNIGHT);
-        board[7][7] = new ChessPiece(PieceColor.WHITE, PieceType.ROOK);
 
         currentTurn = PieceColor.WHITE;
         selectedRow = -1;
@@ -875,7 +1355,7 @@ class BoardPanel extends JPanel {
         board[m.fromR][m.fromC] = null;
         piece.hasMoved = true;
 
-        // Pawn promotion
+        // Pawn promotion upon reaching opposite end rank
         if (piece.type == PieceType.PAWN && (m.toR == 0 || m.toR == 7)) {
             piece.type = askPromotionType();
         }
@@ -904,9 +1384,13 @@ class BoardPanel extends JPanel {
         currentTurn = (currentTurn == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
         gameView.updateTurnHighlights(currentTurn);
 
-        // Stockfish evaluation request
-        String currentFEN = generateFEN();
-        gameView.requestEvaluation(currentFEN);
+        // Evaluation
+        if (currentMode == GameMode.CLASSIC && whiteArmyType == null && blackArmyType == null) {
+            String currentFEN = generateFEN();
+            gameView.requestEvaluation(currentFEN);
+        } else {
+            gameView.updateMaterialEvaluation(board);
+        }
 
         // Check for checkmate or stalemate
         List<Move> nextLegalMoves = getAllLegalMoves(currentTurn, board, epRow, epCol);
@@ -990,7 +1474,7 @@ class BoardPanel extends JPanel {
         if (castling.length() == 0) castling.append('-');
         sb.append(castling.toString());
 
-        // En passant square only if legally capturable (prevents FEN validation error from API)
+        // En passant square only if legally capturable
         boolean canCaptureEp = false;
         if (epRow != -1 && epCol != -1) {
             int pawnR = (currentTurn == PieceColor.WHITE) ? epRow + 1 : epRow - 1;
@@ -1179,7 +1663,6 @@ class BoardPanel extends JPanel {
         if (p == null) return moves;
 
         int forward = (p.color == PieceColor.WHITE) ? -1 : 1;
-        int startRank = (p.color == PieceColor.WHITE) ? 6 : 1;
 
         switch (p.type) {
             case PAWN:
@@ -1187,7 +1670,9 @@ class BoardPanel extends JPanel {
                 if (oneR >= 0 && oneR < 8 && b[oneR][c] == null) {
                     moves.add(new Move(r, c, oneR, c));
                     int twoR = r + 2 * forward;
-                    if (r == startRank && b[twoR][c] == null) {
+                    // Pawns on their starting rank (including back rank in Pawns Only mode) can advance 2 squares
+                    boolean isPawnStart = (p.color == PieceColor.WHITE) ? (r == 6 || r == 7) : (r == 1 || r == 0);
+                    if (isPawnStart && twoR >= 0 && twoR < 8 && b[twoR][c] == null) {
                         moves.add(new Move(r, c, twoR, c));
                     }
                 }
@@ -1245,7 +1730,7 @@ class BoardPanel extends JPanel {
                     }
                 }
 
-                // Castling
+                // Castling (only valid if king has not moved and rook has not moved)
                 if (!p.hasMoved && !isKingInCheck(p.color, b)) {
                     PieceColor opp = (p.color == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
                     ChessPiece kRook = b[r][7];
@@ -1364,7 +1849,7 @@ class BoardPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        Font coordFont = new Font("Poppins", Font.BOLD, 12);
+        Font coordFont = new Font("Segoe UI", Font.BOLD, 12);
 
         int checkKingR = -1, checkKingC = -1;
         if (isKingInCheck(currentTurn, board)) {
@@ -1475,7 +1960,7 @@ class BoardPanel extends JPanel {
             g2.drawImage(img, x, y, null);
         } else {
             g2.setColor(p.color == PieceColor.WHITE ? Color.WHITE : Color.BLACK);
-            g2.setFont(new Font("Poppins", Font.BOLD, 42));
+            g2.setFont(new Font("Segoe UI", Font.BOLD, 42));
             String symbol = p.type.name().substring(0, 1);
             if (p.type == PieceType.KNIGHT) symbol = "N";
             g2.drawString(symbol, x + 24, y + 54);
