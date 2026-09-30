@@ -122,6 +122,7 @@ enum GameMode {
 class MenuView extends JPanel {
     private Chess mainFrame;
     private boolean isTimedSelected = false;
+    private PieceColor selectedBotSide = PieceColor.WHITE;
     private JButton casualBtn;
     private JButton blitzBtn;
 
@@ -129,38 +130,91 @@ class MenuView extends JPanel {
         this.mainFrame = mainFrame;
         setLayout(new BorderLayout());
         setBackground(new Color(48, 46, 43));
-        setPreferredSize(new Dimension(684, 848));
-        setBorder(BorderFactory.createEmptyBorder(24, 32, 24, 32));
+        setPreferredSize(new Dimension(684, 860));
 
         JPanel container = new JPanel();
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         container.setOpaque(false);
+        container.setBorder(BorderFactory.createEmptyBorder(18, 32, 24, 32));
 
         // Header
         JLabel crownLabel = new JLabel("♔", SwingConstants.CENTER);
-        crownLabel.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 44));
+        crownLabel.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 40));
         crownLabel.setForeground(new Color(233, 196, 106));
         crownLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel titleLabel = new JLabel("CHESS", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 40));
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 38));
         titleLabel.setForeground(new Color(245, 245, 245));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel subtitleLabel = new JLabel("Classic Board Game", SwingConstants.CENTER);
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         subtitleLabel.setForeground(new Color(160, 155, 145));
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        container.add(Box.createVerticalGlue());
         container.add(crownLabel);
         container.add(titleLabel);
-        container.add(Box.createRigidArea(new Dimension(0, 4)));
+        container.add(Box.createRigidArea(new Dimension(0, 2)));
         container.add(subtitleLabel);
-        container.add(Box.createRigidArea(new Dimension(0, 22)));
+        container.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        // Play Classic Section
-        JLabel timeHeader = new JLabel("PLAY CLASSIC CHESS", SwingConstants.CENTER);
+        // --- 1. PLAY AGAINST TRAINED AI BOTS SECTION ---
+        JLabel botHeader = new JLabel("PLAY VS TRAINED AI BOTS", SwingConstants.CENTER);
+        botHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        botHeader.setForeground(new Color(233, 196, 106));
+        botHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
+        container.add(botHeader);
+        container.add(Box.createRigidArea(new Dimension(0, 6)));
+
+        // Side selector toggle
+        JPanel sidePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
+        sidePanel.setOpaque(false);
+        sidePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel sidePrompt = new JLabel("Your Side:");
+        sidePrompt.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        sidePrompt.setForeground(new Color(170, 165, 155));
+        sidePanel.add(sidePrompt);
+
+        final JButton whiteSideBtn = new JButton("⚪ Play White (Move 1st)");
+        final JButton blackSideBtn = new JButton("⚫ Play Black (Bot 1st)");
+        styleSideBtn(whiteSideBtn, true);
+        styleSideBtn(blackSideBtn, false);
+
+        whiteSideBtn.addActionListener(e -> {
+            selectedBotSide = PieceColor.WHITE;
+            styleSideBtn(whiteSideBtn, true);
+            styleSideBtn(blackSideBtn, false);
+        });
+        blackSideBtn.addActionListener(e -> {
+            selectedBotSide = PieceColor.BLACK;
+            styleSideBtn(whiteSideBtn, false);
+            styleSideBtn(blackSideBtn, true);
+        });
+
+        sidePanel.add(whiteSideBtn);
+        sidePanel.add(blackSideBtn);
+        container.add(sidePanel);
+        container.add(Box.createRigidArea(new Dimension(0, 8)));
+
+        // 3 Bot Cards Row
+        JPanel botGrid = new JPanel(new GridLayout(1, 3, 10, 0));
+        botGrid.setOpaque(false);
+        botGrid.setMaximumSize(new Dimension(620, 62));
+        botGrid.setPreferredSize(new Dimension(620, 62));
+        botGrid.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        for (final BotLevel bl : BotLevel.values()) {
+            JButton botBtn = createBotCard(bl);
+            botBtn.addActionListener(e -> mainFrame.startBotGame(bl, selectedBotSide, isTimedSelected));
+            botGrid.add(botBtn);
+        }
+        container.add(botGrid);
+        container.add(Box.createRigidArea(new Dimension(0, 18)));
+
+        // --- 2. 2-PLAYER PASS & PLAY SECTION ---
+        JLabel timeHeader = new JLabel("PLAY CLASSIC CHESS (2 PLAYERS)", SwingConstants.CENTER);
         timeHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
         timeHeader.setForeground(new Color(170, 165, 155));
         timeHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -169,8 +223,8 @@ class MenuView extends JPanel {
 
         JPanel timeBtnRow = new JPanel(new GridLayout(1, 2, 14, 0));
         timeBtnRow.setOpaque(false);
-        timeBtnRow.setMaximumSize(new Dimension(520, 50));
-        timeBtnRow.setPreferredSize(new Dimension(520, 50));
+        timeBtnRow.setMaximumSize(new Dimension(520, 44));
+        timeBtnRow.setPreferredSize(new Dimension(520, 44));
         timeBtnRow.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         casualBtn = createPlayButton("Play Casual (Unlimited)", new Color(129, 182, 76), new Color(145, 202, 88));
@@ -189,20 +243,20 @@ class MenuView extends JPanel {
         timeBtnRow.add(casualBtn);
         timeBtnRow.add(blitzBtn);
         container.add(timeBtnRow);
-        container.add(Box.createRigidArea(new Dimension(0, 24)));
+        container.add(Box.createRigidArea(new Dimension(0, 18)));
 
-        // Game Modes Grid
+        // --- 3. ARMY VARIANTS ---
         JLabel modeHeader = new JLabel("SELECT ARMY VARIANT", SwingConstants.CENTER);
         modeHeader.setFont(new Font("Segoe UI", Font.BOLD, 12));
         modeHeader.setForeground(new Color(170, 165, 155));
         modeHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(modeHeader);
-        container.add(Box.createRigidArea(new Dimension(0, 10)));
+        container.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        JPanel gridPanel = new JPanel(new GridLayout(3, 2, 12, 10));
+        JPanel gridPanel = new JPanel(new GridLayout(3, 2, 10, 8));
         gridPanel.setOpaque(false);
-        gridPanel.setMaximumSize(new Dimension(620, 230));
-        gridPanel.setPreferredSize(new Dimension(620, 230));
+        gridPanel.setMaximumSize(new Dimension(620, 210));
+        gridPanel.setPreferredSize(new Dimension(620, 210));
         gridPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         GameMode[] standardModes = {
@@ -217,23 +271,98 @@ class MenuView extends JPanel {
             gridPanel.add(cardBtn);
         }
         container.add(gridPanel);
-        container.add(Box.createRigidArea(new Dimension(0, 10)));
+        container.add(Box.createRigidArea(new Dimension(0, 8)));
 
         // Custom Matchup Card
         JButton customBtn = createCustomDuelCard();
         customBtn.addActionListener(e -> showCustomDuelDialog());
         container.add(customBtn);
-        container.add(Box.createRigidArea(new Dimension(0, 24)));
+        container.add(Box.createRigidArea(new Dimension(0, 14)));
 
         // Footer
-        JLabel footer = new JLabel("Stockfish 16 Engine • Dynamic Evaluation • Chess.com Style", SwingConstants.CENTER);
+        JLabel footer = new JLabel("Trained Neural Engines • Dynamic Evaluation • Chess.com Style", SwingConstants.CENTER);
         footer.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         footer.setForeground(new Color(120, 115, 105));
         footer.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(footer);
-        container.add(Box.createVerticalGlue());
 
-        add(container, BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(container);
+        scrollPane.setBorder(null);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void styleSideBtn(JButton btn, boolean isSelected) {
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        if (isSelected) {
+            btn.setBackground(new Color(129, 182, 76));
+            btn.setForeground(Color.WHITE);
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(160, 215, 100), 1),
+                    BorderFactory.createEmptyBorder(5, 14, 5, 14)));
+        } else {
+            btn.setBackground(new Color(38, 36, 33));
+            btn.setForeground(new Color(170, 165, 155));
+            btn.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(60, 58, 54), 1),
+                    BorderFactory.createEmptyBorder(5, 14, 5, 14)));
+        }
+    }
+
+    private JButton createBotCard(final BotLevel bot) {
+        final JButton btn = new JButton();
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        btn.setLayout(new BorderLayout(8, 0));
+        btn.setBackground(new Color(38, 36, 33));
+        btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(bot.accentColor, 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+
+        JLabel iconLbl = new JLabel(bot.icon, SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+        iconLbl.setPreferredSize(new Dimension(30, 30));
+
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setOpaque(false);
+
+        JLabel titleLbl = new JLabel(bot.title);
+        titleLbl.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        titleLbl.setForeground(Color.WHITE);
+
+        String typeStr = (bot == BotLevel.NOVICE) ? "Linear PST" : (bot == BotLevel.TACTICIAN) ? "Neural MLP" : "NNUE Dual";
+        JLabel eloLbl = new JLabel(bot.elo + " • " + typeStr);
+        eloLbl.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+        eloLbl.setForeground(bot.accentColor);
+
+        textPanel.add(titleLbl);
+        textPanel.add(Box.createRigidArea(new Dimension(0, 1)));
+        textPanel.add(eloLbl);
+
+        btn.add(iconLbl, BorderLayout.WEST);
+        btn.add(textPanel, BorderLayout.CENTER);
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(new Color(52, 50, 46));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(new Color(38, 36, 33));
+            }
+        });
+        return btn;
     }
 
     private JButton createPlayButton(String text, final Color bg, final Color hoverBg) {
