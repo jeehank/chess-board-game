@@ -25,6 +25,11 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 BUILD_DIR = os.path.join(ROOT, "build_apk_tmp")
 OUTPUT_APK = os.path.join(ROOT, "ChessMaster.apk")
 
+# Environment with Java 21 prepended to PATH
+CUSTOM_ENV = os.environ.copy()
+CUSTOM_ENV["JAVA_HOME"] = JAVA_HOME
+CUSTOM_ENV["PATH"] = os.path.join(JAVA_HOME, "bin") + os.pathsep + CUSTOM_ENV.get("PATH", "")
+
 def build_apk():
     print("=" * 60)
     print("      BUILDING NATIVE ANDROID APK (ChessMaster.apk)")
