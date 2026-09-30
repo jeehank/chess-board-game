@@ -64,6 +64,13 @@ public class Chess extends JFrame {
         startGame(GameMode.CLASSIC, false);
     }
 
+    public void startBotGame(BotLevel botLevel, PieceColor playerColor, boolean timed) {
+        gameView.startNewBotGame(botLevel, playerColor, timed);
+        cardLayout.show(mainContainer, "GAME");
+        pack();
+        setLocationRelativeTo(null);
+    }
+
     public void startTimedGame() {
         startGame(GameMode.CLASSIC, true);
     }
