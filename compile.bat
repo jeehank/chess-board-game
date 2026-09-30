@@ -40,10 +40,10 @@ exit /b 1
 
 :found_javac
 echo [1/3] Compiling Chess.java with Java 8 compatibility...
-"%JAVAC_CMD%" --release 8 -d . Chess.java
+"%JAVAC_CMD%" --release 8 -cp . -d . Chess.java BotLevel.java ChessBot.java
 if %errorlevel% neq 0 (
     echo [WARNING] Retrying standard compilation without release flag...
-    "%JAVAC_CMD%" -d . Chess.java
+    "%JAVAC_CMD%" -cp . -d . Chess.java BotLevel.java ChessBot.java
     if %errorlevel% neq 0 (
         echo [ERROR] Compilation failed!
         pause
@@ -53,7 +53,7 @@ if %errorlevel% neq 0 (
 
 echo [2/3] Building standalone executable Chess.jar...
 if not "%JAR_CMD%"=="" (
-    "%JAR_CMD%" cfe Chess.jar Chess *.class pieces
+    "%JAR_CMD%" cfe Chess.jar Chess *.class pieces models
     echo [SUCCESS] Chess.jar packaged successfully!
 )
 
