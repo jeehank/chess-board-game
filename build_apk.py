@@ -229,9 +229,9 @@ public class MainActivity extends Activity {
     size_mb = os.path.getsize(OUTPUT_APK) / (1024 * 1024)
     print()
     print("=" * 60)
-    print(f"  ✅ ChessMaster.apk built successfully! ({size_mb:.2f} MB)")
-    print(f"  📁 {OUTPUT_APK}")
-    print(f"  📱 Transfer to your phone → tap → Install → Play!")
+    print(f"  [OK] ChessMaster.apk built successfully! ({size_mb:.2f} MB)")
+    print(f"  File: {OUTPUT_APK}")
+    print(f"  Transfer to your phone -> tap -> Install -> Play!")
     print("=" * 60)
     return True
 
