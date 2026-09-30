@@ -24,7 +24,10 @@ with open(os.path.join(MODELS_DIR, 'model_tactician.json'), 'r', encoding='utf-8
 with open(os.path.join(MODELS_DIR, 'model_grandmaster.json'), 'r', encoding='utf-8') as f:
     m_grandmaster = json.load(f)
 
-print(f"[*] Loaded trained models: Novice (Elo {m_novice['target_elo']}), Tactician (Elo {m_tactician['target_elo']}), Grandmaster (Elo {m_grandmaster['target_elo']})")
+elo_n = m_novice.get('target_elo', 900)
+elo_t = m_tactician.get('target_elo', 1500)
+elo_g = m_grandmaster.get('target_elo', 2100)
+print(f"[*] Loaded trained models: Novice (Elo {elo_n}), Tactician (Elo {elo_t}), Grandmaster (Elo {elo_g})")
 
 def generate_html(is_phone_installer=False):
     novice_json_str = json.dumps(m_novice)
