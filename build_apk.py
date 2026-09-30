@@ -11,21 +11,23 @@ import shutil
 
 SDK_DIR = r"C:\Users\HP\AppData\Local\Android\Sdk"
 BUILD_TOOLS = os.path.join(SDK_DIR, "build-tools", "36.0.0")
+BUILD_TOOLS_LIB = os.path.join(BUILD_TOOLS, "lib")
 ANDROID_JAR = os.path.join(SDK_DIR, "platforms", "android-36", "android.jar")
+
 JAVA_HOME = r"C:\Program Files\BlueJ\jdk"
+JAVA = os.path.join(JAVA_HOME, "bin", "java.exe")
 JAVAC = os.path.join(JAVA_HOME, "bin", "javac.exe")
 KEYTOOL = os.path.join(JAVA_HOME, "bin", "keytool.exe")
 
 AAPT = os.path.join(BUILD_TOOLS, "aapt.exe")
-D8 = os.path.join(BUILD_TOOLS, "d8.bat")
 ZIPALIGN = os.path.join(BUILD_TOOLS, "zipalign.exe")
-APKSIGNER = os.path.join(BUILD_TOOLS, "apksigner.bat")
+D8_JAR = os.path.join(BUILD_TOOLS_LIB, "d8.jar")
+APKSIGNER_JAR = os.path.join(BUILD_TOOLS_LIB, "apksigner.jar")
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 BUILD_DIR = os.path.join(ROOT, "build_apk_tmp")
 OUTPUT_APK = os.path.join(ROOT, "ChessMaster.apk")
 
-# Environment with Java 21 prepended to PATH
 CUSTOM_ENV = os.environ.copy()
 CUSTOM_ENV["JAVA_HOME"] = JAVA_HOME
 CUSTOM_ENV["PATH"] = os.path.join(JAVA_HOME, "bin") + os.pathsep + CUSTOM_ENV.get("PATH", "")
@@ -159,21 +161,22 @@ public class MainActivity extends Activity {
         "-d", bin_dir,
         java_file
     ]
-    res = subprocess.run(cmd_javac, capture_output=True, text=True)
+    res = subprocess.run(cmd_javac, capture_output=True, text=True, env=CUSTOM_ENV)
     if res.returncode != 0:
         print("[!] javac error:", res.stderr)
         return False
 
-    # 5. Convert .class to classes.dex using d8
+    # 5. Convert .class to classes.dex using d8 (direct java invocation)
     print("[3/5] Converting bytecode with d8 to classes.dex...")
     classes = [os.path.join(bin_dir, "com", "chessmaster", "app", "MainActivity.class")]
     cmd_d8 = [
-        "cmd.exe", "/c", D8,
+        JAVA, "-cp", D8_JAR,
+        "com.android.tools.r8.D8",
         "--min-api", "21",
         "--lib", ANDROID_JAR,
         "--output", bin_dir
     ] + classes
-    res = subprocess.run(cmd_d8, capture_output=True, text=True)
+    res = subprocess.run(cmd_d8, capture_output=True, text=True, env=CUSTOM_ENV)
     if res.returncode != 0:
         print("[!] d8 error:", res.stderr)
         return False
@@ -190,7 +193,7 @@ public class MainActivity extends Activity {
         "-F", unsigned_apk,
         bin_dir
     ]
-    res = subprocess.run(cmd_aapt, capture_output=True, text=True)
+    res = subprocess.run(cmd_aapt, capture_output=True, text=True, env=CUSTOM_ENV)
     if res.returncode != 0:
         print("[!] aapt error:", res.stderr)
         return False
@@ -198,7 +201,7 @@ public class MainActivity extends Activity {
     # 7. Align APK with zipalign
     aligned_apk = os.path.join(BUILD_DIR, "aligned.apk")
     cmd_zipalign = [ZIPALIGN, "-f", "-p", "4", unsigned_apk, aligned_apk]
-    res = subprocess.run(cmd_zipalign, capture_output=True, text=True)
+    res = subprocess.run(cmd_zipalign, capture_output=True, text=True, env=CUSTOM_ENV)
     if res.returncode != 0:
         print("[!] zipalign error:", res.stderr)
         return False
@@ -218,17 +221,17 @@ public class MainActivity extends Activity {
             "-validity", "10000",
             "-dname", "CN=ChessMaster, OU=Chess, O=Chess, L=Local, S=State, C=US"
         ]
-        subprocess.run(cmd_keytool, capture_output=True, text=True)
+        subprocess.run(cmd_keytool, capture_output=True, text=True, env=CUSTOM_ENV)
 
     cmd_sign = [
-        "cmd.exe", "/c", APKSIGNER, "sign",
+        JAVA, "-jar", APKSIGNER_JAR, "sign",
         "--ks", keystore,
         "--ks-pass", "pass:android",
         "--key-pass", "pass:android",
         "--out", OUTPUT_APK,
         aligned_apk
     ]
-    res = subprocess.run(cmd_sign, capture_output=True, text=True)
+    res = subprocess.run(cmd_sign, capture_output=True, text=True, env=CUSTOM_ENV)
     if res.returncode != 0:
         print("[!] apksigner error:", res.stderr)
         return False
@@ -240,8 +243,8 @@ public class MainActivity extends Activity {
     print()
     print("=" * 60)
     print(f" [SUCCESS] Android Installer APK created successfully!")
-    print(f" Output: {OUTPUT_APK} ({size_mb:.2f} MB)")
-    print(f" You can transfer and tap this file on ANY Android phone to install!")
+    print(f" Output File: {OUTPUT_APK} ({size_mb:.2f} MB)")
+    print(f" Ready to install on ANY Android phone!")
     print("=" * 60)
     return True
 
