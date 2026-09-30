@@ -771,7 +771,25 @@ class GameView extends JPanel {
         lbl.setBorder(BorderFactory.createEmptyBorder(3, 10, 3, 10));
     }
 
+    private boolean isVsBot = false;
+    private BotLevel botLevel = null;
+    private PieceColor playerColor = PieceColor.WHITE;
+
+    public void startNewBotGame(BotLevel botLevel, PieceColor playerColor, boolean timed) {
+        this.currentGameMode = GameMode.CLASSIC;
+        this.isTimedMode = timed;
+        this.isVsBot = true;
+        this.botLevel = botLevel;
+        this.playerColor = playerColor;
+        this.currentWhiteArmy = null;
+        this.currentBlackArmy = null;
+        this.currentModeName = "vs " + botLevel.title;
+        applyGameStart();
+    }
+
     public void startNewGame(GameMode mode, boolean timed) {
+        this.isVsBot = false;
+        this.botLevel = null;
         this.currentGameMode = mode;
         this.isTimedMode = timed;
         this.currentWhiteArmy = mode.defaultWhite;
@@ -781,6 +799,8 @@ class GameView extends JPanel {
     }
 
     public void startNewCustomGame(PieceType whitePiece, PieceType blackPiece, boolean timed) {
+        this.isVsBot = false;
+        this.botLevel = null;
         this.currentGameMode = GameMode.CUSTOM;
         this.isTimedMode = timed;
         this.currentWhiteArmy = whitePiece;
@@ -810,16 +830,26 @@ class GameView extends JPanel {
         whiteClockLabel.setVisible(isTimedMode);
         blackClockLabel.setVisible(isTimedMode);
 
-        modeLabel.setText(currentGameMode.icon + " " + currentModeName + (isTimedMode ? " • 10m Blitz" : " • Casual"));
+        if (isVsBot && botLevel != null) {
+            modeLabel.setText(botLevel.icon + " " + botLevel.title + " (AI " + botLevel.elo + ")" + (isTimedMode ? " • 10m Blitz" : " • Casual"));
+            if (playerColor == PieceColor.WHITE) {
+                whiteNameLabel.setText("You (White)");
+                blackNameLabel.setText(botLevel.icon + " " + botLevel.title + " (AI " + botLevel.elo + ")");
+            } else {
+                whiteNameLabel.setText(botLevel.icon + " " + botLevel.title + " (AI " + botLevel.elo + ")");
+                blackNameLabel.setText("You (Black)");
+            }
+        } else {
+            modeLabel.setText(currentGameMode.icon + " " + currentModeName + (isTimedMode ? " • 10m Blitz" : " • Casual"));
+            String wArmyStr = (currentWhiteArmy == null) ? "Classic"
+                    : (currentWhiteArmy.name().substring(0, 1) + currentWhiteArmy.name().substring(1).toLowerCase() + "s");
+            String bArmyStr = (currentBlackArmy == null) ? "Classic"
+                    : (currentBlackArmy.name().substring(0, 1) + currentBlackArmy.name().substring(1).toLowerCase() + "s");
+            whiteNameLabel.setText("White (You) • " + wArmyStr);
+            blackNameLabel.setText("Black (Opponent) • " + bArmyStr);
+        }
 
-        String wArmyStr = (currentWhiteArmy == null) ? "Classic"
-                : (currentWhiteArmy.name().substring(0, 1) + currentWhiteArmy.name().substring(1).toLowerCase() + "s");
-        String bArmyStr = (currentBlackArmy == null) ? "Classic"
-                : (currentBlackArmy.name().substring(0, 1) + currentBlackArmy.name().substring(1).toLowerCase() + "s");
-        whiteNameLabel.setText("White (You) • " + wArmyStr);
-        blackNameLabel.setText("Black (Opponent) • " + bArmyStr);
-
-        boardPanel.resetGame(currentGameMode, currentWhiteArmy, currentBlackArmy);
+        boardPanel.resetGame(currentGameMode, currentWhiteArmy, currentBlackArmy, isVsBot, botLevel, playerColor);
         evaluationBar.resetEvaluation();
 
         if (currentGameMode == GameMode.CLASSIC && currentWhiteArmy == null && currentBlackArmy == null) {
@@ -1275,6 +1305,10 @@ class BoardPanel extends JPanel {
 
     private List<Move> legalMovesForSelected = new ArrayList<>();
     private boolean gameOver = false;
+    private boolean isVsBot = false;
+    private BotLevel botLevel = null;
+    private PieceColor humanColor = PieceColor.WHITE;
+    private volatile boolean botThinking = false;
 
     // Draw detection: position history for threefold repetition + halfmove clock
     // for 50-move rule
@@ -1292,7 +1326,7 @@ class BoardPanel extends JPanel {
         MouseAdapter adapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (gameOver)
+                if (gameOver || (isVsBot && currentTurn != humanColor) || botThinking)
                     return;
 
                 int c = e.getX() / TILE_SIZE;
