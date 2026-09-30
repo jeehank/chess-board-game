@@ -1,34 +1,24 @@
 {
-  "timestamp": "2026-10-01 00:08:17",
-  "training_duration_seconds": 12.71,
-  "total_samples": 3200,
   "models": [
     {
-      "id": "model_novice",
+      "name": "Apprentice Novice Bot",
       "file": "model_novice.json",
-      "name": "Apprentice (Novice Bot)",
-      "elo": 900,
-      "type": "Linear-PST-768",
-      "loss": 0.27474,
-      "badge": "Beginner Friendly"
+      "type": "LinearPST",
+      "final_loss": 0.33064526319503784
     },
     {
-      "id": "model_tactician",
+      "name": "Club Tactician Bot",
       "file": "model_tactician.json",
-      "name": "Tactician (Club Bot)",
-      "elo": 1500,
-      "type": "Neural-MLP-775-48-1",
-      "loss": 0.00064,
-      "badge": "Tactical Threat"
+      "type": "MLP-768-48-1",
+      "final_loss": 0.3561965107046093
     },
     {
-      "id": "model_grandmaster",
+      "name": "Grandmaster Engine Bot",
       "file": "model_grandmaster.json",
-      "name": "Grandmaster (Deep Engine Bot)",
-      "elo": 2100,
-      "type": "NNUE-Perspective-128-32-1",
-      "loss": 0.00067,
-      "badge": "Ruthless Master"
+      "type": "NNUE-768-64-32-1",
+      "final_loss": 0.34451270044687327
     }
-  ]
+  ],
+  "exported_at": "2026-10-01 00:38:32",
+  "version": "1.0"
 }
