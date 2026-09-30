@@ -1464,6 +1464,17 @@ class BoardPanel extends JPanel {
         resetGame(currentMode, whiteArmyType, blackArmyType);
     }
 
+    public void resetGame(GameMode mode, PieceType whiteArmy, PieceType blackArmy, boolean vsBot, BotLevel bot, PieceColor humanCol) {
+        this.isVsBot = vsBot;
+        this.botLevel = bot;
+        this.humanColor = humanCol;
+        this.botThinking = false;
+        resetGame(mode, whiteArmy, blackArmy);
+        if (isVsBot && currentTurn != humanColor) {
+            triggerBotMove();
+        }
+    }
+
     public void resetGame(GameMode mode, PieceType whiteArmy, PieceType blackArmy) {
         this.currentMode = mode;
         this.whiteArmyType = whiteArmy;
@@ -1580,7 +1591,11 @@ class BoardPanel extends JPanel {
 
         // Pawn promotion upon reaching opposite end rank
         if (piece.type == PieceType.PAWN && (m.toR == 0 || m.toR == 7)) {
-            piece.type = askPromotionType();
+            if (isVsBot && piece.color != humanColor) {
+                piece.type = PieceType.QUEEN;
+            } else {
+                piece.type = askPromotionType();
+            }
         }
 
         // Update en passant
@@ -1664,7 +1679,33 @@ class BoardPanel extends JPanel {
             } else {
                 gameView.updateStatus((currentTurn == PieceColor.WHITE ? "White" : "Black") + "'s Turn", null);
             }
+
+            if (isVsBot && currentTurn != humanColor && !gameOver) {
+                triggerBotMove();
+            }
         }
+    }
+
+    private void triggerBotMove() {
+        if (gameOver || botThinking || botLevel == null) return;
+        botThinking = true;
+        gameView.updateStatus(botLevel.icon + " " + botLevel.title + " is thinking...", new Color(233, 196, 106));
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException ignored) {}
+
+            final Move botMove = ChessBot.findBestMove(board, currentTurn, epRow, epCol, botLevel);
+
+            SwingUtilities.invokeLater(() -> {
+                botThinking = false;
+                if (!gameOver && currentTurn != humanColor && botMove != null) {
+                    executeMove(botMove);
+                    repaint();
+                }
+            });
+        }).start();
     }
 
     /**
