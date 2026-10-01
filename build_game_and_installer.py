@@ -478,7 +478,8 @@ def generate_html(is_phone_installer=False):
         }}
 
         .action-btn span.icon {{
-            font-size: 20px;
+            font-size: 14px;
+            font-weight: 700;
         }}
 
         .action-btn:hover, .action-btn:active {{
