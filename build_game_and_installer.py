@@ -225,7 +225,9 @@ def generate_html(is_phone_installer=False):
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
             border: 1px solid rgba(255,255,255,0.1);
         }}
 
@@ -572,7 +574,9 @@ def generate_html(is_phone_installer=False):
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-green);
             flex-shrink: 0;
             border: 1px solid rgba(255,255,255,0.1);
         }}
