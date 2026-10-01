@@ -9,9 +9,9 @@ import java.awt.Color;
  *  - GRANDMASTER: ~2100+ Elo, Deep NNUE Dual-Perspective + Quiescence
  */
 public enum BotLevel {
-    NOVICE("Apprentice Novice", "900 Elo", "🤖", new Color(129, 182, 76), "Fast Linear PST Model • Casual play", 1),
-    TACTICIAN("Club Tactician", "1500 Elo", "🧠", new Color(69, 123, 157), "Neural MLP Model • Tactical & Sharp", 2),
-    GRANDMASTER("Grandmaster Engine", "2100+ Elo", "🏆", new Color(155, 93, 229), "NNUE Deep Network • Master Search", 3);
+    NOVICE("Apprentice Novice", "900 Elo", "I", new Color(129, 182, 76), "Fast Linear PST Model - Casual play", 1),
+    TACTICIAN("Club Tactician", "1500 Elo", "II", new Color(69, 123, 157), "Neural MLP Model - Tactical & Sharp", 2),
+    GRANDMASTER("Grandmaster Engine", "2100+ Elo", "III", new Color(155, 93, 229), "NNUE Deep Network - Master Search", 3);
 
     public final String title;
     public final String elo;
