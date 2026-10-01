@@ -39,16 +39,16 @@ def generate_html(is_phone_installer=False):
         installer_banner_html = """
         <!-- Android Phone One-Tap Install Header Banner -->
         <div id="phone-install-banner" style="width:100%; background:linear-gradient(135deg, #1e3a20, #142415); border:1px solid #4a8522; border-radius:12px; padding:14px 16px; margin-bottom:14px; box-shadow:0 4px 16px rgba(0,0,0,0.4); text-align:center;">
-            <div style="font-size:16px; font-weight:700; color:#a3d160; margin-bottom:6px;">📲 Install Chess Master on Your Phone</div>
+            <div style="font-size:16px; font-weight:700; color:#a3d160; margin-bottom:6px;">Install Chess Master on Your Phone</div>
             <div style="font-size:13px; color:#d0cfcd; line-height:1.4; margin-bottom:12px;">
                 Play offline anytime! Install directly to your Android home screen or download the native APK.
             </div>
             <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
                 <button id="pwa-quick-install-btn" style="background:#81b64c; color:#fff; border:none; padding:10px 18px; border-radius:22px; font-weight:700; font-size:14px; cursor:pointer; box-shadow:0 3px 10px rgba(129,182,76,0.4);">
-                    ⚡ 1-Tap Quick Install
+                    1-Tap Quick Install
                 </button>
                 <a href="/ChessMaster.apk" download style="text-decoration:none; background:#2a2b28; color:#fff; border:1px solid #555; padding:10px 18px; border-radius:22px; font-weight:600; font-size:14px; display:inline-flex; align-items:center; gap:6px;">
-                    📥 Download APK
+                    Download APK
                 </a>
             </div>
         </div>
@@ -638,10 +638,10 @@ def generate_html(is_phone_installer=False):
         </div>
         <div class="header-actions">
             <div class="bot-badge-pill" id="header-bot-pill" onclick="openBotModal()">
-                <span id="pill-icon">🧠</span>
+                <span id="pill-icon">Bot</span>
                 <span id="pill-name">Tactician (~1500)</span>
             </div>
-            <button class="icon-btn" onclick="openSettingsModal()" title="Options">⚙️</button>
+            <button class="icon-btn" onclick="openSettingsModal()" title="Options">Settings</button>
         </div>
     </header>
 
@@ -652,7 +652,7 @@ def generate_html(is_phone_installer=False):
         <!-- Top Player (Opponent / Bot) -->
         <div class="player-bar" id="top-player-bar">
             <div class="player-info">
-                <div class="player-avatar" id="top-avatar">🧠</div>
+                <div class="player-avatar" id="top-avatar">Bot</div>
                 <div class="player-meta">
                     <div class="player-name">
                         <span id="top-name">Club Tactician</span>
@@ -679,7 +679,7 @@ def generate_html(is_phone_installer=False):
         <!-- Bottom Player (User) -->
         <div class="player-bar" id="bottom-player-bar">
             <div class="player-info">
-                <div class="player-avatar" id="bottom-avatar">👤</div>
+                <div class="player-avatar" id="bottom-avatar">You</div>
                 <div class="player-meta">
                     <div class="player-name">
                         <span id="bottom-name">You (White)</span>
@@ -706,19 +706,19 @@ def generate_html(is_phone_installer=False):
     <!-- Bottom Actions -->
     <nav class="action-bar">
         <button class="action-btn" onclick="newGame()">
-            <span class="icon">🔄</span>
+            <span class="icon">+</span>
             <span>New Game</span>
         </button>
         <button class="action-btn" onclick="undoMove()">
-            <span class="icon">↩️</span>
+            <span class="icon">&#8617;</span>
             <span>Undo</span>
         </button>
         <button class="action-btn" onclick="flipBoard()">
-            <span class="icon">🔃</span>
+            <span class="icon">&#8693;</span>
             <span>Flip</span>
         </button>
         <button class="action-btn" onclick="openBotModal()">
-            <span class="icon">🤖</span>
+            <span class="icon">AI</span>
             <span>Change Bot</span>
         </button>
     </nav>
@@ -731,7 +731,7 @@ def generate_html(is_phone_installer=False):
             
             <!-- Bot 1: Novice -->
             <div class="bot-choice-card" id="card-bot-novice" onclick="selectBot('novice')">
-                <div class="bot-card-avatar">🤖</div>
+                <div class="bot-card-avatar">I</div>
                 <div class="bot-card-details">
                     <div class="bot-card-header">
                         <div class="bot-card-name">Apprentice (Novice)</div>
@@ -745,7 +745,7 @@ def generate_html(is_phone_installer=False):
 
             <!-- Bot 2: Tactician -->
             <div class="bot-choice-card" id="card-bot-tactician" onclick="selectBot('tactician')">
-                <div class="bot-card-avatar">🧠</div>
+                <div class="bot-card-avatar">II</div>
                 <div class="bot-card-details">
                     <div class="bot-card-header">
                         <div class="bot-card-name">Club Tactician</div>
@@ -759,7 +759,7 @@ def generate_html(is_phone_installer=False):
 
             <!-- Bot 3: Grandmaster -->
             <div class="bot-choice-card" id="card-bot-grandmaster" onclick="selectBot('grandmaster')">
-                <div class="bot-card-avatar">🏆</div>
+                <div class="bot-card-avatar">III</div>
                 <div class="bot-card-details">
                     <div class="bot-card-header">
                         <div class="bot-card-name">Grandmaster Engine</div>
@@ -812,7 +812,7 @@ def generate_html(is_phone_installer=False):
                 id: 'novice',
                 name: 'Apprentice Novice',
                 elo: 900,
-                icon: '🤖',
+                icon: 'I',
                 desc: 'Trained Linear PST (900 Elo)',
                 model: MODEL_NOVICE,
                 depth: 2
@@ -821,7 +821,7 @@ def generate_html(is_phone_installer=False):
                 id: 'tactician',
                 name: 'Club Tactician',
                 elo: 1500,
-                icon: '🧠',
+                icon: 'II',
                 desc: 'Trained MLP Neural Net (1500 Elo)',
                 model: MODEL_TACTICIAN,
                 depth: 3
@@ -830,7 +830,7 @@ def generate_html(is_phone_installer=False):
                 id: 'grandmaster',
                 name: 'Grandmaster Engine',
                 elo: 2100,
-                icon: '🏆',
+                icon: 'III',
                 desc: 'Deep Dual Perspective NNUE (2100+ Elo)',
                 model: MODEL_GRANDMASTER,
                 depth: 3
