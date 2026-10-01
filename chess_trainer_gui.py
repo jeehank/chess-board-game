@@ -390,7 +390,7 @@ class ChessTrainerApp:
         top = tk.Frame(self.root, bg="#16213e", pady=10, padx=16)
         top.pack(fill=tk.X)
 
-        tk.Label(top, text="👑 CHESS AI BOT TRAINER & BUILD SYSTEM",
+        tk.Label(top, text="CHESS AI BOT TRAINER & BUILD SYSTEM",
                  font=("Segoe UI", 16, "bold"), fg="#e94560", bg="#16213e").pack(anchor="w")
         tk.Label(top, text="Train 3 increasingly powerful bots & deploy directly to Windows (.jar, .bat) and Android (.apk)",
                  font=("Segoe UI", 10), fg="#a0a0b0", bg="#16213e").pack(anchor="w")
@@ -433,7 +433,7 @@ class ChessTrainerApp:
         tk.Checkbutton(r2, variable=self.continuous_var, bg="#1a1a2e", fg="#ffd166",
                        selectcolor="#16213e", activebackground="#1a1a2e",
                        font=("Segoe UI", 10, "bold"),
-                       text="♾️ Continuous Training Mode (Train endlessly until you click STOP)").pack(side=tk.LEFT)
+                       text="Continuous Training Mode (Train endlessly until you click STOP)").pack(side=tk.LEFT)
 
         # Model Cards Selection
         bot_frame = tk.LabelFrame(self.root, text=" Select Bots to Train (Progressive Architectures) ",
@@ -446,12 +446,12 @@ class ChessTrainerApp:
         self.train_grandmaster = tk.BooleanVar(value=True)
 
         bot_defs = [
-            (self.train_novice, "🤖 Apprentice Novice (~900 Elo)",
-             "Linear PST Model • 2,500 training samples • Fast 1-ply search with natural casual blunders"),
-            (self.train_tactician, "🧠 Club Tactician (~1500 Elo)",
-             "Neural MLP (768->64->1) • 10,000 samples (4x data!) • 2-ply Minimax + tactical center play"),
-            (self.train_grandmaster, "🏆 Grandmaster Engine (2100+ Elo)",
-             "NNUE Dual-Perspective (768->128->64->1) • 30,000 samples (12x data!) • 3-ply Minimax + Quiescence Search")
+            (self.train_novice, "Apprentice Novice (~900 Elo)",
+             "Linear PST Model - 2,500 training samples - Fast 1-ply search with natural casual blunders"),
+            (self.train_tactician, "Club Tactician (~1500 Elo)",
+             "Neural MLP (768->64->1) - 10,000 samples (4x data!) - 2-ply Minimax + tactical center play"),
+            (self.train_grandmaster, "Grandmaster Engine (2100+ Elo)",
+             "NNUE Dual-Perspective (768->128->64->1) - 30,000 samples (12x data!) - 3-ply Minimax + Quiescence Search")
         ]
 
         for var, title, desc in bot_defs:
@@ -467,21 +467,21 @@ class ChessTrainerApp:
         act_frame = tk.Frame(self.root, bg="#1a1a2e", pady=8)
         act_frame.pack(fill=tk.X, padx=16)
 
-        self.start_btn = tk.Button(act_frame, text="▶ START TRAINING",
+        self.start_btn = tk.Button(act_frame, text="START TRAINING",
                                    font=("Segoe UI", 11, "bold"),
                                    bg="#e94560", fg="white", activebackground="#c9184a",
                                    padx=20, pady=8, bd=0, cursor="hand2",
                                    command=self._start_training)
         self.start_btn.pack(side=tk.LEFT, padx=(0, 10))
 
-        self.stop_btn = tk.Button(act_frame, text="⏹ STOP",
+        self.stop_btn = tk.Button(act_frame, text="STOP",
                                   font=("Segoe UI", 11, "bold"),
                                   bg="#555566", fg="white", activebackground="#777788",
                                   padx=20, pady=8, bd=0, state=tk.DISABLED,
                                   command=self._stop_training)
         self.stop_btn.pack(side=tk.LEFT, padx=(0, 10))
 
-        self.export_btn = tk.Button(act_frame, text="📦 EXPORT & UPDATE WINDOWS + ANDROID",
+        self.export_btn = tk.Button(act_frame, text="EXPORT & UPDATE WINDOWS + ANDROID",
                                     font=("Segoe UI", 11, "bold"),
                                     bg="#0f3460", fg="white", activebackground="#16213e",
                                     padx=20, pady=8, bd=0, cursor="hand2",
@@ -514,9 +514,9 @@ class ChessTrainerApp:
         scroller.pack(side=tk.RIGHT, fill=tk.Y)
         self.log_txt.configure(yscrollcommand=scroller.set)
 
-        self._log("👑 Chess AI Model Trainer Initialized.")
-        self._log(f"📁 Project Root: {ROOT}")
-        self._log("💡 Click 'EXPORT & UPDATE WINDOWS + ANDROID' anytime to deploy existing or newly trained models!\n")
+        self._log("Chess AI Model Trainer Initialized.")
+        self._log(f"Project Root: {ROOT}")
+        self._log("Click 'EXPORT & UPDATE WINDOWS + ANDROID' anytime to deploy existing or newly trained models!\n")
 
     def _log(self, text):
         self.log_txt.insert(tk.END, text + "\n")
@@ -579,10 +579,10 @@ class ChessTrainerApp:
                     bot_epochs = int(epochs * 1.6)
 
                 self._log(f"\n{'='*55}")
-                self._log(f"🎯 Training: {model.name} ({model.elo})")
+                self._log(f"Training: {model.name} ({model.elo})")
                 self._log(f"   Architecture: {model.__class__.__name__}")
                 self._log(f"   Dataset Size: {model.training_samples} board positions")
-                self._log(f"   Epochs: {'♾️ Continuous' if is_continuous else bot_epochs}")
+                self._log(f"   Epochs: {'Continuous' if is_continuous else bot_epochs}")
                 self._log(f"{'='*55}")
 
                 self.root.after(0, lambda m=model: self.status_lbl.configure(
@@ -623,10 +623,10 @@ class ChessTrainerApp:
                         self._log(f"   Run {epoch:5d}  [{bar_str}]  MSE Loss: {loss:.6f}")
 
                 self.models[bot_key] = model
-                self._log(f"\n   ✅ {model.name} training complete! Best Loss: {best_loss:.6f}")
+                self._log(f"\n   [OK] {model.name} training complete! Best Loss: {best_loss:.6f}")
 
             self._log(f"\n{'='*55}")
-            self._log("🎉 TRAINING ROUND COMPLETED!")
+            self._log("TRAINING ROUND COMPLETED!")
             self._log("Click 'EXPORT & UPDATE WINDOWS + ANDROID' to deploy your new models.")
             self._log(f"{'='*55}")
 
@@ -650,7 +650,7 @@ class ChessTrainerApp:
         try:
             os.makedirs(MODELS_DIR, exist_ok=True)
             self._log("\n" + "=" * 55)
-            self._log("🚀 EXPORTING MODELS & UPDATING APPS")
+            self._log("EXPORTING MODELS & UPDATING APPS")
             self._log("=" * 55)
 
             # 1. Save JSON weights
@@ -675,7 +675,7 @@ class ChessTrainerApp:
             res_html = subprocess.run([sys.executable, "build_game_and_installer.py"],
                                       cwd=ROOT, capture_output=True, text=True)
             if res_html.returncode == 0:
-                self._log("      ✅ index.html, Install-Chess-Android.html & Install-On-Phone.html updated!")
+                self._log("      [OK] index.html, Install-Chess-Android.html & Install-On-Phone.html updated!")
             else:
                 self._log(f"      [!] Warning updating HTML: {res_html.stderr.strip()[:300]}")
 
@@ -696,7 +696,7 @@ class ChessTrainerApp:
                 if res_javac.returncode == 0:
                     subprocess.run([jar, "cfe", "Chess.jar", "Chess", "*.class", "pieces", "models"],
                                    cwd=ROOT, capture_output=True, text=True, env=CUSTOM_ENV)
-                    self._log("      ✅ Recompiled Chess.jar with updated Bot models!")
+                    self._log("      [OK] Recompiled Chess.jar with updated Bot models!")
                 else:
                     self._log(f"      [!] Javac warning: {res_javac.stderr.strip()[:200]}")
             else:
@@ -706,7 +706,7 @@ class ChessTrainerApp:
             res_win = subprocess.run([sys.executable, "build_windows_installer.py"],
                                      cwd=ROOT, capture_output=True, text=True)
             if res_win.returncode == 0:
-                self._log("      ✅ Install-Chess-Windows.bat updated with latest Chess.jar!")
+                self._log("      [OK] Install-Chess-Windows.bat updated with latest Chess.jar!")
 
             # 4. Rebuild Android APK (build_apk.py)
             self._log("[4/4] Rebuilding and signing Android APK (ChessMaster.apk)...")
@@ -714,15 +714,15 @@ class ChessTrainerApp:
                                      cwd=ROOT, capture_output=True, text=True, env=CUSTOM_ENV)
             if res_apk.returncode == 0:
                 apk_mb = os.path.getsize(os.path.join(ROOT, "ChessMaster.apk")) / (1024 * 1024)
-                self._log(f"      ✅ ChessMaster.apk successfully built & signed! ({apk_mb:.2f} MB)")
+                self._log(f"      [OK] ChessMaster.apk successfully built & signed! ({apk_mb:.2f} MB)")
             else:
                 self._log(f"      [!] APK build warning: {res_apk.stderr.strip()[:300]}")
 
             self._log("\n" + "=" * 55)
-            self._log("✨ ALL PLATFORMS UPDATED SUCCESSFULLY!")
-            self._log("   • Windows: Run run.bat or Install-Chess-Windows.bat")
-            self._log("   • Android: Install ChessMaster.apk on phone")
-            self._log("   • Web: Open index.html in any browser")
+            self._log("ALL PLATFORMS UPDATED SUCCESSFULLY!")
+            self._log("   Windows: Run run.bat or Install-Chess-Windows.bat")
+            self._log("   Android: Install ChessMaster.apk on phone")
+            self._log("   Web: Open index.html in any browser")
             self._log("=" * 55 + "\n")
 
             messagebox.showinfo("Export & Build Complete",

@@ -88,18 +88,18 @@ public class Chess extends JFrame {
 }
 
 enum GameMode {
-    CLASSIC("Classic Chess", "Standard traditional FIDE setup & rules", "👑", new Color(233, 196, 106), null, null),
-    ALL_PAWNS("Pawns Only", "1 King + 15 Pawns on both sides. A massive pawn war!", "♟", new Color(129, 182, 76),
+    CLASSIC("Classic Chess", "Standard traditional FIDE setup & rules", "", new Color(233, 196, 106), null, null),
+    ALL_PAWNS("Pawns Only", "1 King + 15 Pawns per side", "", new Color(129, 182, 76),
             PieceType.PAWN, PieceType.PAWN),
-    ALL_BISHOPS("Bishops Only", "1 King + 15 Bishops on both sides. Diagonal snipers!", "♝", new Color(42, 157, 143),
+    ALL_BISHOPS("Bishops Only", "1 King + 15 Bishops per side", "", new Color(42, 157, 143),
             PieceType.BISHOP, PieceType.BISHOP),
-    ALL_KNIGHTS("Knights Only", "1 King + 15 Knights on both sides. Wild jumping combat!", "♞", new Color(231, 111, 81),
+    ALL_KNIGHTS("Knights Only", "1 King + 15 Knights per side", "", new Color(231, 111, 81),
             PieceType.KNIGHT, PieceType.KNIGHT),
-    ALL_ROOKS("Rooks Only", "1 King + 15 Rooks on both sides. Heavy artillery fortress!", "♜", new Color(69, 123, 157),
+    ALL_ROOKS("Rooks Only", "1 King + 15 Rooks per side", "", new Color(69, 123, 157),
             PieceType.ROOK, PieceType.ROOK),
-    ALL_QUEENS("Queens Only", "1 King + 15 Queens on both sides. Ultimate royal mayhem!", "♛", new Color(155, 93, 229),
+    ALL_QUEENS("Queens Only", "1 King + 15 Queens per side", "", new Color(155, 93, 229),
             PieceType.QUEEN, PieceType.QUEEN),
-    CUSTOM("Custom Duel", "Choose custom army piece types for White & Black!", "⚔", new Color(230, 57, 70), null, null);
+    CUSTOM("Custom Duel", "Choose custom army piece types for White & Black", "", new Color(230, 57, 70), null, null);
 
     final String title;
     final String description;
@@ -138,8 +138,8 @@ class MenuView extends JPanel {
         container.setBorder(BorderFactory.createEmptyBorder(18, 32, 24, 32));
 
         // Header
-        JLabel crownLabel = new JLabel("♔", SwingConstants.CENTER);
-        crownLabel.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 40));
+        JLabel crownLabel = new JLabel("CHESS", SwingConstants.CENTER);
+        crownLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
         crownLabel.setForeground(new Color(233, 196, 106));
         crownLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -177,8 +177,8 @@ class MenuView extends JPanel {
         sidePrompt.setForeground(new Color(170, 165, 155));
         sidePanel.add(sidePrompt);
 
-        final JButton whiteSideBtn = new JButton("⚪ Play White (Move 1st)");
-        final JButton blackSideBtn = new JButton("⚫ Play Black (Bot 1st)");
+        final JButton whiteSideBtn = new JButton("Play White (Move 1st)");
+        final JButton blackSideBtn = new JButton("Play Black (Bot 1st)");
         styleSideBtn(whiteSideBtn, true);
         styleSideBtn(blackSideBtn, false);
 
@@ -329,7 +329,8 @@ class MenuView extends JPanel {
                 BorderFactory.createEmptyBorder(6, 10, 6, 10)));
 
         JLabel iconLbl = new JLabel(bot.icon, SwingConstants.CENTER);
-        iconLbl.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 22));
+        iconLbl.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        iconLbl.setForeground(bot.accentColor);
         iconLbl.setPreferredSize(new Dimension(30, 30));
 
         JPanel textPanel = new JPanel();
@@ -404,8 +405,9 @@ class MenuView extends JPanel {
                 BorderFactory.createEmptyBorder(8, 12, 8, 12)));
 
         // Left Icon
-        JLabel iconLbl = new JLabel(mode.icon, SwingConstants.CENTER);
-        iconLbl.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 28));
+        String modeInitial = mode.title.substring(0, 1);
+        JLabel iconLbl = new JLabel(modeInitial, SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI", Font.BOLD, 22));
         iconLbl.setForeground(mode.accentColor);
         iconLbl.setPreferredSize(new Dimension(36, 36));
 
@@ -466,8 +468,8 @@ class MenuView extends JPanel {
                 BorderFactory.createLineBorder(new Color(230, 57, 70), 1),
                 BorderFactory.createEmptyBorder(8, 16, 8, 16)));
 
-        JLabel iconLbl = new JLabel("⚔", SwingConstants.CENTER);
-        iconLbl.setFont(new Font("Segoe UI Symbol", Font.PLAIN, 28));
+        JLabel iconLbl = new JLabel("VS", SwingConstants.CENTER);
+        iconLbl.setFont(new Font("Segoe UI", Font.BOLD, 18));
         iconLbl.setForeground(new Color(230, 57, 70));
         iconLbl.setPreferredSize(new Dimension(36, 36));
 
@@ -487,7 +489,7 @@ class MenuView extends JPanel {
         textPanel.add(Box.createRigidArea(new Dimension(0, 2)));
         textPanel.add(descLbl);
 
-        JLabel arrowLbl = new JLabel("Setup >");
+        JLabel arrowLbl = new JLabel("Setup");
         arrowLbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
         arrowLbl.setForeground(new Color(230, 57, 70));
 
@@ -536,12 +538,12 @@ class MenuView extends JPanel {
         content.add(Box.createRigidArea(new Dimension(0, 20)));
 
         String[] options = {
-                "♟ Pawns (1 King + 15 Pawns)",
-                "♝ Bishops (1 King + 15 Bishops)",
-                "♞ Knights (1 King + 15 Knights)",
-                "♜ Rooks (1 King + 15 Rooks)",
-                "♛ Queens (1 King + 15 Queens)",
-                "👑 Classic Traditional Army"
+                "Pawns (1 King + 15 Pawns)",
+                "Bishops (1 King + 15 Bishops)",
+                "Knights (1 King + 15 Knights)",
+                "Rooks (1 King + 15 Rooks)",
+                "Queens (1 King + 15 Queens)",
+                "Classic Traditional Army"
         };
         final PieceType[] pieceMap = {
                 PieceType.PAWN,
@@ -596,7 +598,7 @@ class MenuView extends JPanel {
         cancelBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         cancelBtn.addActionListener(e -> dialog.dispose());
 
-        JButton startBtn = new JButton("Start Duel ⚔");
+        JButton startBtn = new JButton("Start Duel");
         startBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         startBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         startBtn.setBackground(new Color(129, 182, 76));
@@ -658,7 +660,7 @@ class GameView extends JPanel {
         topHeader.setBackground(new Color(38, 36, 33));
         topHeader.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
 
-        JButton backBtn = new JButton("◀ Menu");
+        JButton backBtn = new JButton("Back");
         backBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         backBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
         backBtn.setBackground(new Color(230, 230, 230));
@@ -751,8 +753,9 @@ class GameView extends JPanel {
         JPanel left = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         left.setOpaque(false);
 
-        JLabel avatar = new JLabel(isWhite ? "⚪" : "⚫");
-        avatar.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        JLabel avatar = new JLabel(isWhite ? "W" : "B");
+        avatar.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        avatar.setForeground(isWhite ? new Color(245, 245, 245) : new Color(120, 118, 115));
 
         nameLbl.setFont(new Font("Segoe UI", Font.BOLD, 14));
         nameLbl.setForeground(new Color(230, 230, 230));
@@ -831,16 +834,16 @@ class GameView extends JPanel {
         blackClockLabel.setVisible(isTimedMode);
 
         if (isVsBot && botLevel != null) {
-            modeLabel.setText(botLevel.icon + " " + botLevel.title + " (AI " + botLevel.elo + ")" + (isTimedMode ? " • 10m Blitz" : " • Casual"));
+            modeLabel.setText(botLevel.title + " (AI " + botLevel.elo + ")" + (isTimedMode ? " - 10m Blitz" : " - Casual"));
             if (playerColor == PieceColor.WHITE) {
                 whiteNameLabel.setText("You (White)");
-                blackNameLabel.setText(botLevel.icon + " " + botLevel.title + " (AI " + botLevel.elo + ")");
+                blackNameLabel.setText(botLevel.title + " (AI " + botLevel.elo + ")");
             } else {
-                whiteNameLabel.setText(botLevel.icon + " " + botLevel.title + " (AI " + botLevel.elo + ")");
+                whiteNameLabel.setText(botLevel.title + " (AI " + botLevel.elo + ")");
                 blackNameLabel.setText("You (Black)");
             }
         } else {
-            modeLabel.setText(currentGameMode.icon + " " + currentModeName + (isTimedMode ? " • 10m Blitz" : " • Casual"));
+            modeLabel.setText(currentModeName + (isTimedMode ? " - 10m Blitz" : " - Casual"));
             String wArmyStr = (currentWhiteArmy == null) ? "Classic"
                     : (currentWhiteArmy.name().substring(0, 1) + currentWhiteArmy.name().substring(1).toLowerCase() + "s");
             String bArmyStr = (currentBlackArmy == null) ? "Classic"
