@@ -171,7 +171,8 @@ def generate_html(is_phone_installer=False):
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 20px;
+            font-size: 12px;
+            font-weight: 600;
             padding: 6px;
             border-radius: 8px;
             cursor: pointer;
