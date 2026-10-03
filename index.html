@@ -115,7 +115,8 @@
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 20px;
+            font-size: 12px;
+            font-weight: 600;
             padding: 6px;
             border-radius: 8px;
             cursor: pointer;
@@ -168,7 +169,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -419,7 +422,8 @@
         }
 
         .action-btn span.icon {
-            font-size: 20px;
+            font-size: 14px;
+            font-weight: 700;
         }
 
         .action-btn:hover, .action-btn:active {
@@ -515,7 +519,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-green);
             flex-shrink: 0;
             border: 1px solid rgba(255,255,255,0.1);
         }
@@ -582,10 +588,10 @@
         </div>
         <div class="header-actions">
             <div class="bot-badge-pill" id="header-bot-pill" onclick="openBotModal()">
-                <span id="pill-icon">🧠</span>
+                <span id="pill-icon">Bot</span>
                 <span id="pill-name">Tactician (~1500)</span>
             </div>
-            <button class="icon-btn" onclick="openSettingsModal()" title="Options">⚙️</button>
+            <button class="icon-btn" onclick="openSettingsModal()" title="Options">Settings</button>
         </div>
     </header>
 
@@ -596,7 +602,7 @@
         <!-- Top Player (Opponent / Bot) -->
         <div class="player-bar" id="top-player-bar">
             <div class="player-info">
-                <div class="player-avatar" id="top-avatar">🧠</div>
+                <div class="player-avatar" id="top-avatar">Bot</div>
                 <div class="player-meta">
                     <div class="player-name">
                         <span id="top-name">Club Tactician</span>
@@ -623,7 +629,7 @@
         <!-- Bottom Player (User) -->
         <div class="player-bar" id="bottom-player-bar">
             <div class="player-info">
-                <div class="player-avatar" id="bottom-avatar">👤</div>
+                <div class="player-avatar" id="bottom-avatar">You</div>
                 <div class="player-meta">
                     <div class="player-name">
                         <span id="bottom-name">You (White)</span>
@@ -650,19 +656,19 @@
     <!-- Bottom Actions -->
     <nav class="action-bar">
         <button class="action-btn" onclick="newGame()">
-            <span class="icon">🔄</span>
+            <span class="icon">+</span>
             <span>New Game</span>
         </button>
         <button class="action-btn" onclick="undoMove()">
-            <span class="icon">↩️</span>
+            <span class="icon">&#8617;</span>
             <span>Undo</span>
         </button>
         <button class="action-btn" onclick="flipBoard()">
-            <span class="icon">🔃</span>
+            <span class="icon">&#8693;</span>
             <span>Flip</span>
         </button>
         <button class="action-btn" onclick="openBotModal()">
-            <span class="icon">🤖</span>
+            <span class="icon">AI</span>
             <span>Change Bot</span>
         </button>
     </nav>
@@ -675,7 +681,7 @@
             
             <!-- Bot 1: Novice -->
             <div class="bot-choice-card" id="card-bot-novice" onclick="selectBot('novice')">
-                <div class="bot-card-avatar">🤖</div>
+                <div class="bot-card-avatar">I</div>
                 <div class="bot-card-details">
                     <div class="bot-card-header">
                         <div class="bot-card-name">Apprentice (Novice)</div>
@@ -689,7 +695,7 @@
 
             <!-- Bot 2: Tactician -->
             <div class="bot-choice-card" id="card-bot-tactician" onclick="selectBot('tactician')">
-                <div class="bot-card-avatar">🧠</div>
+                <div class="bot-card-avatar">II</div>
                 <div class="bot-card-details">
                     <div class="bot-card-header">
                         <div class="bot-card-name">Club Tactician</div>
@@ -703,7 +709,7 @@
 
             <!-- Bot 3: Grandmaster -->
             <div class="bot-choice-card" id="card-bot-grandmaster" onclick="selectBot('grandmaster')">
-                <div class="bot-card-avatar">🏆</div>
+                <div class="bot-card-avatar">III</div>
                 <div class="bot-card-details">
                     <div class="bot-card-header">
                         <div class="bot-card-name">Grandmaster Engine</div>
@@ -756,7 +762,7 @@
                 id: 'novice',
                 name: 'Apprentice Novice',
                 elo: 900,
-                icon: '🤖',
+                icon: 'I',
                 desc: 'Trained Linear PST (900 Elo)',
                 model: MODEL_NOVICE,
                 depth: 2
@@ -765,7 +771,7 @@
                 id: 'tactician',
                 name: 'Club Tactician',
                 elo: 1500,
-                icon: '🧠',
+                icon: 'II',
                 desc: 'Trained MLP Neural Net (1500 Elo)',
                 model: MODEL_TACTICIAN,
                 depth: 3
@@ -774,7 +780,7 @@
                 id: 'grandmaster',
                 name: 'Grandmaster Engine',
                 elo: 2100,
-                icon: '🏆',
+                icon: 'III',
                 desc: 'Deep Dual Perspective NNUE (2100+ Elo)',
                 model: MODEL_GRANDMASTER,
                 depth: 3

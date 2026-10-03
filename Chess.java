@@ -138,26 +138,20 @@ class MenuView extends JPanel {
         container.setBorder(BorderFactory.createEmptyBorder(18, 32, 24, 32));
 
         // Header
-        JLabel crownLabel = new JLabel("CHESS", SwingConstants.CENTER);
-        crownLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        crownLabel.setForeground(new Color(233, 196, 106));
-        crownLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel titleLabel = new JLabel("CHESS", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 38));
+        JLabel titleLabel = new JLabel("CHESS MASTER", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 34));
         titleLabel.setForeground(new Color(245, 245, 245));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel subtitleLabel = new JLabel("Classic Board Game", SwingConstants.CENTER);
-        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        subtitleLabel.setForeground(new Color(160, 155, 145));
+        JLabel subtitleLabel = new JLabel("Trained Neural Engines & Classic Chess", SwingConstants.CENTER);
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        subtitleLabel.setForeground(new Color(170, 165, 155));
         subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        container.add(crownLabel);
         container.add(titleLabel);
-        container.add(Box.createRigidArea(new Dimension(0, 2)));
+        container.add(Box.createRigidArea(new Dimension(0, 4)));
         container.add(subtitleLabel);
-        container.add(Box.createRigidArea(new Dimension(0, 16)));
+        container.add(Box.createRigidArea(new Dimension(0, 20)));
 
         // --- 1. PLAY AGAINST TRAINED AI BOTS SECTION ---
         JLabel botHeader = new JLabel("PLAY VS TRAINED AI BOTS", SwingConstants.CENTER);
