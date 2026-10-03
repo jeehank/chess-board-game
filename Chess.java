@@ -657,11 +657,13 @@ class GameView extends JPanel {
         JButton backBtn = new JButton("Back");
         backBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         backBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        backBtn.setBackground(new Color(230, 230, 230));
-        backBtn.setForeground(Color.BLACK);
+        backBtn.setBackground(new Color(48, 46, 43));
+        backBtn.setForeground(new Color(230, 230, 230));
         backBtn.setFocusPainted(false);
         backBtn.setOpaque(true);
-        backBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+        backBtn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(75, 72, 67), 1),
+                BorderFactory.createEmptyBorder(6, 16, 6, 16)));
         backBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         backBtn.addActionListener(e -> mainFrame.showMenu());
         topHeader.add(backBtn, BorderLayout.WEST);
@@ -689,11 +691,13 @@ class GameView extends JPanel {
         JButton resetBtn = new JButton("Restart");
         resetBtn.setUI(new javax.swing.plaf.basic.BasicButtonUI());
         resetBtn.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        resetBtn.setBackground(new Color(230, 230, 230));
-        resetBtn.setForeground(Color.BLACK);
+        resetBtn.setBackground(new Color(48, 46, 43));
+        resetBtn.setForeground(new Color(230, 230, 230));
         resetBtn.setFocusPainted(false);
         resetBtn.setOpaque(true);
-        resetBtn.setBorder(BorderFactory.createEmptyBorder(6, 14, 6, 14));
+        resetBtn.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(75, 72, 67), 1),
+                BorderFactory.createEmptyBorder(6, 16, 6, 16)));
         resetBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         resetBtn.addActionListener(e -> restartCurrentGame());
         topHeader.add(resetBtn, BorderLayout.EAST);
