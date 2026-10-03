@@ -124,7 +124,8 @@ html_content = '''<!DOCTYPE html>
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 12px;
+            font-weight: 600;
             transition: background 0.15s;
         }
 
@@ -171,7 +172,9 @@ html_content = '''<!DOCTYPE html>
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -410,7 +413,8 @@ html_content = '''<!DOCTYPE html>
         }
 
         .btn-icon {
-            font-size: 17px;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         /* Modals & Overlays */
@@ -558,9 +562,9 @@ html_content = '''<!DOCTYPE html>
         </div>
         <div class="header-actions">
             <button id="pwa-install-btn" class="install-btn" style="display:none;">
-                <span>📱</span> Install App
+                <span>Install App</span>
             </button>
-            <button id="mode-btn" class="icon-btn" title="Game Mode">⚙️</button>
+            <button id="mode-btn" class="icon-btn" title="Game Mode">Settings</button>
         </div>
     </header>
 
@@ -570,7 +574,7 @@ html_content = '''<!DOCTYPE html>
         <!-- Top Player (Black) -->
         <div class="player-bar">
             <div class="player-info">
-                <div class="player-avatar" id="top-avatar">🤖</div>
+                <div class="player-avatar" id="top-avatar">Bot</div>
                 <div>
                     <div class="player-name" id="top-name">Computer (AI)</div>
                     <div class="player-sub">
@@ -597,7 +601,7 @@ html_content = '''<!DOCTYPE html>
         <!-- Bottom Player (White) -->
         <div class="player-bar">
             <div class="player-info">
-                <div class="player-avatar" id="bottom-avatar">👤</div>
+                <div class="player-avatar" id="bottom-avatar">You</div>
                 <div>
                     <div class="player-name" id="bottom-name">You (White)</div>
                     <div class="player-sub">
@@ -614,19 +618,19 @@ html_content = '''<!DOCTYPE html>
     <!-- Bottom Controls -->
     <footer class="controls-bar">
         <button class="btn primary" id="new-game-btn">
-            <span class="btn-icon">🔄</span>
+            <span class="btn-icon">+</span>
             <span>New Game</span>
         </button>
         <button class="btn" id="flip-board-btn">
-            <span class="btn-icon">🔁</span>
+            <span class="btn-icon">&#8693;</span>
             <span>Flip</span>
         </button>
         <button class="btn" id="undo-btn">
-            <span class="btn-icon">↩️</span>
+            <span class="btn-icon">&#8617;</span>
             <span>Undo</span>
         </button>
         <button class="btn" id="game-info-btn">
-            <span class="btn-icon">🏆</span>
+            <span class="btn-icon">AI</span>
             <span>Modes</span>
         </button>
     </footer>
@@ -658,11 +662,11 @@ html_content = '''<!DOCTYPE html>
             <h2 class="modal-title">Game Options</h2>
             <p class="modal-subtitle">Select game mode and difficulty:</p>
             <div class="modal-btn-group">
-                <button class="modal-btn primary" onclick="setMode('ai-easy')">🤖 vs Computer (Easy)</button>
-                <button class="modal-btn primary" onclick="setMode('ai-medium')">🧠 vs Computer (Medium)</button>
-                <button class="modal-btn primary" onclick="setMode('ai-hard')">⚡ vs Computer (Hard)</button>
-                <button class="modal-btn" onclick="setMode('pass-and-play')">👥 2 Players (Pass & Play)</button>
-                <button class="modal-btn" onclick="setMode('pawns-only')">♟️ Pawns Only Battle</button>
+                <button class="modal-btn primary" onclick="setMode('ai-easy')">vs Computer (Easy)</button>
+                <button class="modal-btn primary" onclick="setMode('ai-medium')">vs Computer (Medium)</button>
+                <button class="modal-btn primary" onclick="setMode('ai-hard')">vs Computer (Hard)</button>
+                <button class="modal-btn" onclick="setMode('pass-and-play')">2 Players (Pass & Play)</button>
+                <button class="modal-btn" onclick="setMode('pawns-only')">Pawns Only Battle</button>
                 <button class="modal-btn" onclick="setMode('knights-only')">♞ Knights Only Rampage</button>
                 <button class="modal-btn" style="background:#555;" onclick="closeModal('settings-modal')">Close</button>
             </div>
@@ -1524,7 +1528,7 @@ html_content = '''<!DOCTYPE html>
 
             const isAI = gameMode.startsWith('ai');
             document.getElementById('top-name').innerText = isAI ? `Computer (${gameMode.split('-')[1]})` : 'Player 2 (Black)';
-            document.getElementById('top-avatar').innerText = isAI ? '🤖' : '👤';
+            document.getElementById('top-avatar').innerText = isAI ? 'Bot' : 'P2';
 
             renderBoard();
             updateStatus();
